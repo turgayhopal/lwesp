@@ -22,6 +22,9 @@ void UART1_IRQHandler(void) {
     {
 			uint8_t in_char = UART_READ(ll_uart_t.uart_t);
 			ll_uart_t.rx_handler(in_char);
+#if LWESP_UART_IT_DEBUG == 1
+			printf("%c", in_char);
+#endif
 		};
 	}
 }

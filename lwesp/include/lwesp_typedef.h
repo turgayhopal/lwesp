@@ -35,23 +35,44 @@ typedef enum lwesp_cmd_type_e{
 } lwesp_cmd_type_t;
 
 typedef enum lwesp_at_echo_e{
-	LWESP_AT_ECHO_ON = 0x01,
-	LWESP_AT_ECHO_OFF = 0x00
+	LWESP_AT_ECHO_OFF = 0x00,
+	LWESP_AT_ECHO_ON = 0x01
 }lwesp_at_echo_t;
 
 typedef struct lwesp_at_parameter_s {
 	lwesp_cmd_type_t cmd_type;
-	uint8_t cmd_key[20];
+	uint8_t cmd_key[30];
+	uint8_t cmd_params[30];
+	uint8_t resp_ok_key[30];
+	uint8_t resp_err_key[30];
 } lwesp_at_parameter_t;
+
+typedef struct lwesp_basic_at_version_s {
+	uint8_t at_version_info[30];
+	uint8_t sdk_version_info[30];
+	uint8_t bin_version[30];
+} lwesp_basic_at_version_t;
+
+typedef struct lwesp_basic_at_sleep_mode_s {
+	uint8_t sleep_mode[1];
+} lwesp_basic_at_sleep_mode_t;
+
+typedef struct lwesp_basic_at_rf_power_s {
+	uint8_t rf_power[2];
+} lwesp_basic_at_rf_power_t;
+
 
 typedef struct lwesp_basic_command_s {
 	lwesp_resp_t (*lwesp_ll_init)						(void);
 	lwesp_resp_t (*lwesp_check_alive)				(void);
 	lwesp_resp_t (*lwesp_reset_chip)				(void);
-	lwesp_resp_t (*lwesp_check_version)			(void);
+	lwesp_resp_t (*lwesp_check_version)			(lwesp_basic_at_version_t *at_version_t);
 	lwesp_resp_t (*lwesp_enter_deep_sleep)	(uint32_t time_ms);
 	lwesp_resp_t (*lwesp_set_commands_echo)	(lwesp_at_echo_t echo);
 	lwesp_resp_t (*lwesp_restore_chip)			(void);
+	lwesp_resp_t (*lwesp_check_sleep_mode)	(lwesp_basic_at_sleep_mode_t *sleep_mode);
+	lwesp_resp_t (*lwesp_set_sleep_mode)		(lwesp_basic_at_sleep_mode_t sleep_mode);
+	lwesp_resp_t (*lwesp_set_rf_power)			(lwesp_basic_at_rf_power_t rf_power);
 } lwesp_basic_command_t;
 
 typedef struct lwesp_client_s {

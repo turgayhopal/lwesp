@@ -13,6 +13,9 @@ lwesp_resp_t lwesp_init(lwesp_client_t *client) {
 	client->basic.lwesp_reset_chip = lwesp_reset_chip;
 	client->basic.lwesp_restore_chip = lwesp_restore_chip;
 	client->basic.lwesp_set_commands_echo = lwesp_set_commands_echo;
+	client->basic.lwesp_set_sleep_mode = lwesp_set_sleep_mode;
+	client->basic.lwesp_check_sleep_mode = lwesp_check_sleep_mode;
+	client->basic.lwesp_set_rf_power = lwesp_set_rf_power;
 	
 	lwesp_ll_t lwesp_ll;
 	lwesp_ll_init(&lwesp_ll);

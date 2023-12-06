@@ -17,6 +17,11 @@
 //   <i> Host MCU Selection	
 #define LWESP_MCU									 	1
 
+//   <o>UART IT Debug <0=>Disable
+//                		<1=>Enable
+//   <i> Host MCU Selection	
+#define LWESP_UART_IT_DEBUG				 	1
+
 
 //   <e>Chip Select ESP8266
 #define LWESP_CHIP_ESP8266        	1
