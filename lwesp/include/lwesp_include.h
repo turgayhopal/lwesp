@@ -8,5 +8,6 @@
 #define INC_LWESP_INCLUDE_H_
 
 #include "lwesp_at_basic.h"
+#include "lwesp_at_wifi.h"
 
 #endif /* INC_LWESP_INCLUDE_H_ */

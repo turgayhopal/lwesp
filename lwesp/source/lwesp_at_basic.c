@@ -10,76 +10,57 @@ static volatile lwesp_resp_t lwesp_at_resp_flag;
 static lwesp_at_parameter_t basic_at_test_p = {
 	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
 	.cmd_key  = "AT",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_reset_p = {
 	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
 	.cmd_key  = "AT+RST",
-	.cmd_params = NULL,
-	.resp_ok_key = "ready",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_version_p = {
 	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
 	.cmd_key  = "AT+GMR",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
-
+	.cmd_params = NULL
 };
 static lwesp_at_parameter_t basic_at_deep_slee_p = {
 	.cmd_type = LWESP_CMD_TYPE_SET,
 	.cmd_key  = "AT+GSLP",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_echo_p = {
 	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
 	.cmd_key  = "ATE",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_restore_p = {
 	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
 	.cmd_key  = "AT+RESTORE",
-	.cmd_params = NULL,
-	.resp_ok_key = "ready",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_check_sleep_mode_p = {
 	.cmd_type = LWESP_CMD_TYPE_QUERY,
 	.cmd_key  = "AT+SLEEP",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_set_sleep_mode_p = {
 	.cmd_type = LWESP_CMD_TYPE_SET,
 	.cmd_key  = "AT+SLEEP",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
 static lwesp_at_parameter_t basic_at_set_rf_power_p = {
 	.cmd_type = LWESP_CMD_TYPE_SET,
 	.cmd_key  = "AT+RFPOWER",
-	.cmd_params = NULL,
-	.resp_ok_key = "OK",
-	.resp_err_key = "ERROR",
+	.cmd_params = NULL
 };
 
-lwesp_resp_t LWESP_AWAIT_RESP(uint32_t ms) {
+lwesp_resp_t LWESP_BASIC_AWAIT_RESP(uint32_t ms) {
 	
 	TickType_t ticks = xTaskGetTickCount();
   uint32_t start_tick = ticks / (configTICK_RATE_HZ / 1000);
@@ -95,7 +76,7 @@ lwesp_resp_t LWESP_AWAIT_RESP(uint32_t ms) {
 	return lwesp_at_resp_flag;
 }
 
-void lwesp_sys_resp_callback(lwesp_resp_t resp) {
+void lwesp_sys_resp_callback_basic(lwesp_resp_t resp) {
 	switch(resp) {
 		case LWESP_RESP_OK:
 			printf("******************RESP OK******************\r\n");
@@ -107,6 +88,8 @@ void lwesp_sys_resp_callback(lwesp_resp_t resp) {
 			break;
 		case LWESP_RESP_UNKNOW:
 			break;
+		case LWESP_RESP_FAIL:
+			break;
 		case LWESP_RESP_TIMEOUT:
 			break;
 		case LWESP_RESP_CONF_ERR:
@@ -115,9 +98,8 @@ void lwesp_sys_resp_callback(lwesp_resp_t resp) {
 	}
 }
 
-void lwesp_basic_init(void) {
-	lwesp_at_resp_flag = LWESP_RESP_OK;
-	lwesp_sys_init(lwesp_sys_resp_callback);
+void lwesp_at_basic_focus_on(void) {
+	lwesp_sys_set_resp_callback(lwesp_sys_resp_callback_basic);
 }
 
 lwesp_resp_t lwesp_check_alive(void) {
@@ -125,14 +107,14 @@ lwesp_resp_t lwesp_check_alive(void) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_test_p);
 	
-	return LWESP_AWAIT_RESP(100);
+	return LWESP_BASIC_AWAIT_RESP(100);
 }
 
 lwesp_resp_t lwesp_reset_chip(void) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_reset_p);
 	
-	return LWESP_AWAIT_RESP(2000);
+	return LWESP_BASIC_AWAIT_RESP(2000);
 }
 
 lwesp_resp_t lwesp_check_version(lwesp_basic_at_version_t *at_version) {
@@ -141,7 +123,7 @@ lwesp_resp_t lwesp_check_version(lwesp_basic_at_version_t *at_version) {
 	
 	lwesp_sys_send_command(basic_at_version_p);
 	
-	lwesp_at_resp_flag = LWESP_AWAIT_RESP(100);
+	lwesp_at_resp_flag = LWESP_BASIC_AWAIT_RESP(100);
 	
 	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
 		lwesp_sys_at_get_version(at_version);
@@ -157,7 +139,7 @@ lwesp_resp_t lwesp_enter_deep_sleep(uint32_t time_ms) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_deep_slee_p);
 	
-	return LWESP_AWAIT_RESP(100);
+	return LWESP_BASIC_AWAIT_RESP(100);
 }
 
 lwesp_resp_t lwesp_set_commands_echo(lwesp_at_echo_t echo) {
@@ -167,14 +149,14 @@ lwesp_resp_t lwesp_set_commands_echo(lwesp_at_echo_t echo) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_echo_p);
 	
-	return LWESP_AWAIT_RESP(100);
+	return LWESP_BASIC_AWAIT_RESP(100);
 }
 
 lwesp_resp_t lwesp_restore_chip(void) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_restore_p);
 	
-	return LWESP_AWAIT_RESP(2000);
+	return LWESP_BASIC_AWAIT_RESP(2000);
 }
 
 lwesp_resp_t lwesp_set_sleep_mode(lwesp_basic_at_sleep_mode_t sleep_mode) {
@@ -184,7 +166,7 @@ lwesp_resp_t lwesp_set_sleep_mode(lwesp_basic_at_sleep_mode_t sleep_mode) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_set_sleep_mode_p);
 	
-	return LWESP_AWAIT_RESP(100);
+	return LWESP_BASIC_AWAIT_RESP(100);
 }
 
 lwesp_resp_t lwesp_check_sleep_mode(lwesp_basic_at_sleep_mode_t *sleep_mode) {
@@ -192,7 +174,7 @@ lwesp_resp_t lwesp_check_sleep_mode(lwesp_basic_at_sleep_mode_t *sleep_mode) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_check_sleep_mode_p);
 	
-	lwesp_at_resp_flag = LWESP_AWAIT_RESP(100);
+	lwesp_at_resp_flag = LWESP_BASIC_AWAIT_RESP(100);
 	
 	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
 		lwesp_sys_at_get_sleep_mode(sleep_mode);
@@ -207,5 +189,5 @@ lwesp_resp_t lwesp_set_rf_power(lwesp_basic_at_rf_power_t rf_power) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(basic_at_set_rf_power_p);
 	
-	return LWESP_AWAIT_RESP(100);
+	return LWESP_BASIC_AWAIT_RESP(100);
 }

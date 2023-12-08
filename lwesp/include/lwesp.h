@@ -9,6 +9,6 @@
 
 #include "lwesp_include.h"
 
-lwesp_resp_t lwesp_init(lwesp_client_t *client);
+lwesp_resp_t lwesp_init(lwesp_client_t *client, lwesp_resp_wifi_callback wifi_callback);
 
 #endif /* INC_LWESP_H_ */

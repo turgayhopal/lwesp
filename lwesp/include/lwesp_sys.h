@@ -20,19 +20,25 @@
 #endif
 
 typedef void (*lwesp_resp_callback)(lwesp_resp_t resp);
+typedef void (*lwesp_resp_wifi_callback)(lwesp_resp_wifi_t resp, void *);
 
 typedef struct lwesp_sys_s {
 	lwesp_resp_callback resp_callback;
-	char resp_ok_key[20];
-	char resp_err_key[20];
+	lwesp_resp_wifi_callback resp_wifi_callback;
 }lwesp_sys_t;
 
 void vRxHandlerTask(void *pvParameters);
 
-void lwesp_sys_init(lwesp_resp_callback resp_callback);
+void lwesp_sys_init(void);
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter);
+
+void lwesp_sys_set_resp_callback(lwesp_resp_callback resp_callback);
+void lwesp_sys_set_resp_wifi_callback(lwesp_resp_wifi_callback resp_callback);
 
 void lwesp_sys_at_get_version(lwesp_basic_at_version_t *at_version);
 void lwesp_sys_at_get_sleep_mode(lwesp_basic_at_sleep_mode_t *sleep_mode);
+
+void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t save_flash_st);
+void lwesp_sys_at_get_list_ap(void);
 
 #endif /* INC_LWESP_SYS_H_ */

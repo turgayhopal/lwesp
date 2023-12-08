@@ -22,10 +22,22 @@
 typedef enum lwesp_resp_e{
 	LWESP_RESP_OK,
 	LWESP_RESP_ERR,
+	LWESP_RESP_FAIL,
 	LWESP_RESP_UNKNOW,
 	LWESP_RESP_TIMEOUT,
 	LWESP_RESP_CONF_ERR
 } lwesp_resp_t;	
+
+typedef enum lwesp_resp_basic_e {
+	LWESP_RESP_BASIC_READY
+} lwesp_resp_basic_t;
+
+typedef enum lwesp_resp_wifi_e {
+	LWESP_RESP_WIFI_DISCONNECT,
+	LWESP_RESP_WIFI_CONNECTED,
+	LWESP_RESP_WIFI_GOT_IP,
+	LWESP_RESP_WIFI_AP_FOUND,
+} lwesp_resp_wifi_t;
 
 typedef enum lwesp_cmd_type_e{
 	LWESP_CMD_TYPE_TEST,
@@ -43,8 +55,6 @@ typedef struct lwesp_at_parameter_s {
 	lwesp_cmd_type_t cmd_type;
 	uint8_t cmd_key[30];
 	uint8_t cmd_params[30];
-	uint8_t resp_ok_key[30];
-	uint8_t resp_err_key[30];
 } lwesp_at_parameter_t;
 
 typedef struct lwesp_basic_at_version_s {
@@ -54,16 +64,14 @@ typedef struct lwesp_basic_at_version_s {
 } lwesp_basic_at_version_t;
 
 typedef struct lwesp_basic_at_sleep_mode_s {
-	uint8_t sleep_mode[1];
+	uint8_t sleep_mode[2];
 } lwesp_basic_at_sleep_mode_t;
 
 typedef struct lwesp_basic_at_rf_power_s {
 	uint8_t rf_power[2];
 } lwesp_basic_at_rf_power_t;
 
-
 typedef struct lwesp_basic_command_s {
-	lwesp_resp_t (*lwesp_ll_init)						(void);
 	lwesp_resp_t (*lwesp_check_alive)				(void);
 	lwesp_resp_t (*lwesp_reset_chip)				(void);
 	lwesp_resp_t (*lwesp_check_version)			(lwesp_basic_at_version_t *at_version_t);
@@ -75,8 +83,33 @@ typedef struct lwesp_basic_command_s {
 	lwesp_resp_t (*lwesp_set_rf_power)			(lwesp_basic_at_rf_power_t rf_power);
 } lwesp_basic_command_t;
 
+typedef struct lwesp_wifi_at_wifi_mode_s {
+	uint8_t wifi_mode[2];
+}lwesp_wifi_at_wifi_mode_t;
+
+typedef struct lwesp_wifi_at_wifi_ap_s {
+	uint8_t ssid[50];
+	uint8_t passwd[50];
+}lwesp_wifi_at_wifi_ap_t;
+
+typedef struct lwesp_wifi_at_list_ap_s {
+	int scrty_mode;
+	char ssid[50];
+	int rssi;
+	char mac[18];
+	int channel;
+} lwesp_wifi_at_list_ap_t;
+
+typedef struct lwesp_wifi_command_s {
+	lwesp_resp_t (*lwesp_set_wifi_mode)	 	(lwesp_wifi_at_wifi_mode_t wifi_mode, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_check_wifi_mode)	(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_connect_ap)		 	(lwesp_wifi_at_wifi_ap_t wifi_ap, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_list_aps) 				(void);
+} lwesp_wifi_command_t;
+
 typedef struct lwesp_client_s {
 	lwesp_basic_command_t basic;
+	lwesp_wifi_command_t  wifi;
 } lwesp_client_t;
 
 typedef struct lwesp_ll_s {

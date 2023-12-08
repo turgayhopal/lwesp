@@ -7,7 +7,7 @@
 #ifndef INC_LWESP_QUEUE_H_
 #define INC_LWESP_QUEUE_H_
 
-#define LWESP_QUEUE_SIZE 256
+#define LWESP_QUEUE_SIZE 2048
 
 #include <stdint.h>
 #include <string.h>

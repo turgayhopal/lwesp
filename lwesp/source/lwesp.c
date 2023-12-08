@@ -5,7 +5,7 @@
 
 #include "lwesp.h"
 
-lwesp_resp_t lwesp_init(lwesp_client_t *client) {
+lwesp_resp_t lwesp_init(lwesp_client_t *client, lwesp_resp_wifi_callback wifi_callback) {
 	
 	client->basic.lwesp_check_alive = lwesp_check_alive;
 	client->basic.lwesp_check_version = lwesp_check_version;
@@ -17,17 +17,17 @@ lwesp_resp_t lwesp_init(lwesp_client_t *client) {
 	client->basic.lwesp_check_sleep_mode = lwesp_check_sleep_mode;
 	client->basic.lwesp_set_rf_power = lwesp_set_rf_power;
 	
-	lwesp_ll_t lwesp_ll;
-	lwesp_ll_init(&lwesp_ll);
-
-	lwesp_basic_init();
+	client->wifi.lwesp_set_wifi_mode = lwesp_set_wifi_mode;
+	client->wifi.lwesp_check_wifi_mode = lwesp_check_wifi_mode;
+	client->wifi.lwesp_connect_ap = lwesp_connect_ap;
+	client->wifi.lwesp_list_aps = lwesp_list_aps;
+	
+	lwesp_sys_init();
+	lwesp_sys_set_resp_wifi_callback(wifi_callback);
+	
+	lwesp_at_basic_focus_on();
 	
 	lwesp_resp_t resp;
-	
-	resp |= lwesp_ll.lwesp_ll_configure_uart_clock();
-	resp |= lwesp_ll.lwesp_ll_configure_pin();
-	resp |= lwesp_ll.lwesp_ll_configure_uart();
-	resp |= lwesp_ll.lwesp_ll_configure_uart_irq();
-		
+
 	return resp;
 }

@@ -9,7 +9,7 @@
 #include "lwesp_typedef.h"
 #include "lwesp_sys.h"
 
-void lwesp_basic_init(void);
+void lwesp_at_basic_focus_on(void);
 
 lwesp_resp_t lwesp_check_alive(void);
 

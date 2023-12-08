@@ -5,6 +5,7 @@
 
 #include "lwesp_ll_m480.h"
 
+#ifdef USE_M480_DK
 static lwesp_ll_uart_t ll_uart_t = {
 	.uart_t 										= UART1,
 	.baudrate 									= 115200,
@@ -13,6 +14,18 @@ static lwesp_ll_uart_t ll_uart_t = {
 	.reset_pin                  = &PH3,
 	.rx_handler							    = NULL
 };
+#endif
+
+#ifdef USE_RBOT_ON_DESK
+static lwesp_ll_uart_t ll_uart_t = {
+	.uart_t 										= UART1,
+	.baudrate 									= 115200,
+	.reset_port									= PE,
+	.reset_bit    						  = BIT10,
+	.reset_pin                  = &PE10,
+	.rx_handler							    = NULL
+};
+#endif
 
 void UART1_IRQHandler(void) {
 	
@@ -111,8 +124,19 @@ lwesp_resp_t lwesp_ll_configure_uart_clock(void) {
 }
 
 lwesp_resp_t lwesp_ll_configure_pin(void) {
+	
+#ifdef USE_M480_DK
 	SYS->GPH_MFPH &= ~(SYS_GPH_MFPH_PH8MFP_Msk | SYS_GPH_MFPH_PH9MFP_Msk);
 	SYS->GPH_MFPH |= (SYS_GPH_MFPH_PH8MFP_UART1_TXD | SYS_GPH_MFPH_PH9MFP_UART1_RXD);
+#endif
+	
+#ifdef USE_RBOT_ON_DESK
+	SYS->GPC_MFPH &= ~(SYS_GPC_MFPH_PC15MFP_Msk);
+	SYS->GPC_MFPH |= (SYS_GPC_MFPH_PC8MFP_UART1_RXD);
+	
+	SYS->GPE_MFPH &= ~(SYS_GPE_MFPH_PE11MFP_Msk | SYS_GPE_MFPH_PE12MFP_Msk | SYS_GPE_MFPH_PE13MFP_Msk);
+	SYS->GPE_MFPH |= (SYS_GPE_MFPH_PE11MFP_UART1_nCTS | SYS_GPE_MFPH_PE12MFP_UART1_nRTS | SYS_GPE_MFPH_PE13MFP_UART1_TXD);
+#endif
 	
 	return LWESP_RESP_OK;
 }
