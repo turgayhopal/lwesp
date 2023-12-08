@@ -37,6 +37,9 @@ typedef enum lwesp_resp_wifi_e {
 	LWESP_RESP_WIFI_CONNECTED,
 	LWESP_RESP_WIFI_GOT_IP,
 	LWESP_RESP_WIFI_AP_FOUND,
+	LWESP_RESP_WIFI_STA_CONNECTED,
+	LWESP_RESP_WIFI_STA_DISCONNECTED,
+	LWESP_RESP_WIFI_STA_GET_IP,
 } lwesp_resp_wifi_t;
 
 typedef enum lwesp_cmd_type_e{
@@ -92,19 +95,29 @@ typedef struct lwesp_wifi_at_wifi_ap_s {
 	uint8_t passwd[50];
 }lwesp_wifi_at_wifi_ap_t;
 
-typedef struct lwesp_wifi_at_list_ap_s {
-	int scrty_mode;
-	char ssid[50];
-	int rssi;
-	char mac[18];
-	int channel;
-} lwesp_wifi_at_list_ap_t;
+typedef struct lwesp_wifi_at_create_soft_ap_s {
+	uint8_t ssid[50];
+	uint8_t passwd[50];
+	uint8_t channel;
+	uint8_t ecn;
+}lwesp_wifi_at_create_soft_ap_t;
 
 typedef struct lwesp_wifi_command_s {
+#if LWESP_CHIP_ESP8266 == 1
 	lwesp_resp_t (*lwesp_set_wifi_mode)	 	(lwesp_wifi_at_wifi_mode_t wifi_mode, uint8_t save_flash_st);
 	lwesp_resp_t (*lwesp_check_wifi_mode)	(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t save_flash_st);
 	lwesp_resp_t (*lwesp_connect_ap)		 	(lwesp_wifi_at_wifi_ap_t wifi_ap, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_create_soft_ap)  (lwesp_wifi_at_create_soft_ap_t soft_ap, uint8_t save_flash_st);
+#endif
+#if LWESP_CHIP_ESP32 == 1
+	lwesp_resp_t (*lwesp_set_wifi_mode)	 	(lwesp_wifi_at_wifi_mode_t wifi_mode);
+	lwesp_resp_t (*lwesp_check_wifi_mode)	(lwesp_wifi_at_wifi_mode_t *wifi_mode);
+	lwesp_resp_t (*lwesp_connect_ap)		 	(lwesp_wifi_at_wifi_ap_t wifi_ap);
+	lwesp_resp_t (*lwesp_create_soft_ap)  (lwesp_wifi_at_create_soft_ap_t soft_ap);
+	
+#endif
 	lwesp_resp_t (*lwesp_list_aps) 				(void);
+	lwesp_resp_t (*lwesp_disconnect_ap)   (void);
 } lwesp_wifi_command_t;
 
 typedef struct lwesp_client_s {

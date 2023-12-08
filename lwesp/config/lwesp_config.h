@@ -24,12 +24,12 @@
 
 
 //   <e>Chip Select ESP8266
-#define LWESP_CHIP_ESP8266        	1
+#define LWESP_CHIP_ESP8266        	0
 
 //   </e>
 
 //   <e>Chip Select ESP32
-#define LWESP_CHIP_ESP32	        	0
+#define LWESP_CHIP_ESP32	        	1
 
 
 //   </e>

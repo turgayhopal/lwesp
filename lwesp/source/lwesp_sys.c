@@ -60,6 +60,22 @@ void vRxHandlerTask(void *pvParameters) {
 				lwesp_queue_flush(&lwesp_queue_rx);
 				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_GOT_IP, NULL);
 			}
+			
+			if (strstr((char *)lwesp_queue_rx.data, "+STA_CONNECTED") != NULL ) {
+				lwesp_queue_flush(&lwesp_queue_rx);
+				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_CONNECTED, NULL);
+			}
+			
+			if (strstr((char *)lwesp_queue_rx.data, "+STA_DISCONNECTED") != NULL ) {
+				lwesp_queue_flush(&lwesp_queue_rx);
+				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_DISCONNECTED, NULL);
+			}
+			
+			if (strstr((char *)lwesp_queue_rx.data, "+DIST_STA_IP") != NULL ) {
+				lwesp_queue_flush(&lwesp_queue_rx);
+				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, NULL);
+			}
+	
 			vTaskDelay(1);
 		}
 	}
@@ -129,6 +145,27 @@ void lwesp_sys_at_get_sleep_mode(lwesp_basic_at_sleep_mode_t *sleep_mode) {
 	}
 }
 
+#if LWESP_CHIP_ESP32 == 1
+void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode) {
+	
+	char* token;
+	char* rest = (char *)lwesp_response_buffer;
+	
+	while ((token = strtok_r(rest, "\n", &rest))) {
+		char* key = strtok(token, ":");
+		char* value = strtok(NULL, ":");
+
+		if (key != NULL && value != NULL) {
+			if (strstr(key, "+CWMODE") != NULL) {
+				sprintf((char *)wifi_mode->wifi_mode, "%s", value);
+			}
+		}
+	}
+}
+
+#endif
+
+#if LWESP_CHIP_ESP8266 == 1
 void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t save_flash_st) {
 	char* token;
 	char* rest = (char *)lwesp_response_buffer;
@@ -150,6 +187,8 @@ void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t sa
 		}
 	}
 }
+
+#endif
 
 void lwesp_sys_at_get_list_ap(void) {
 
