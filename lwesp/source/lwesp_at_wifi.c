@@ -155,7 +155,7 @@ lwesp_resp_t lwesp_create_soft_ap(lwesp_wifi_at_create_soft_ap_t soft_ap, uint8_
 		sprintf((char *)wifi_at_create_soft_ap_p.cmd_key, "%s_CUR", wifi_at_create_soft_ap_p.cmd_key);
 	}
 	
-	sprintf((char *)wifi_at_create_soft_ap_p.cmd_params, "\"%s\",\"%s\",%d,%d", soft_ap.ssid, soft_ap.passwd, soft_ap.channel, soft_ap.securty_enc);
+	sprintf((char *)wifi_at_create_soft_ap_p.cmd_params, "\"%s\",\"%s\",%d,%d", soft_ap.ssid, soft_ap.passwd, soft_ap.channel, soft_ap.ecn);
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_create_soft_ap_p);
