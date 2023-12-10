@@ -34,6 +34,12 @@ lwesp_resp_t lwesp_init(lwesp_client_t *client, lwesp_resp_wifi_callback wifi_ca
 	client->wifi.lwesp_set_ap_ip = lwesp_set_ap_ip;
 	client->wifi.lwesp_check_ap_ip = lwesp_check_ap_ip;
 	
+	client->tcp.lwesp_check_conn_status = lwesp_check_conn_status;
+	client->tcp.lwesp_resolve_domain = lwesp_resolve_domain;
+	client->tcp.lwesp_ping_ip = lwesp_ping_ip;
+	client->tcp.lwesp_set_connection_type = lwesp_set_connection_type;
+	client->tcp.lwesp_set_transmission_mode = lwesp_set_transmission_mode;
+	
 	lwesp_sys_init();
 	lwesp_sys_set_resp_wifi_callback(wifi_callback);
 	

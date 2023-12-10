@@ -56,5 +56,8 @@ void lwesp_sys_at_get_ip_sta(lwesp_wifi_at_ip_t *ip_addr);
 
 void lwesp_sys_at_get_list_ap(void);
 void lwesp_sys_at_check_soft_ap_devices(void);
+void lwesp_sys_at_get_conn_stat(lwesp_tcp_at_conn_t *conn);
+void lwesp_sys_at_get_domain_name(lwesp_tcp_at_domain_t *domain);
+void lwesp_sys_at_get_ping_time(lwesp_tcp_at_ping_t *ping);
 
 #endif /* INC_LWESP_SYS_H_ */

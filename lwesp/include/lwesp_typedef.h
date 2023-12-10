@@ -54,6 +54,16 @@ typedef enum lwesp_at_echo_e{
 	LWESP_AT_ECHO_ON = 0x01
 }lwesp_at_echo_t;
 
+typedef enum lwesp_at_transmission_mode_e{
+	LWESP_AT_TRANSMODE_NORMAL = 0x00,
+	LWESP_AT_TRANSMODE_WIFI = 0x01
+}lwesp_at_transmission_mode_t;
+
+typedef enum lwesp_at_connection_type_e{
+	LWESP_AT_CONN_TYPE_SINGLE = 0x00,
+	LWESP_AT_CONN_TYPE_MULTIPLE = 0x01
+}lwesp_at_connection_type_t;
+
 typedef struct lwesp_at_parameter_s {
 	lwesp_cmd_type_t cmd_type;
 	uint8_t cmd_key[30];
@@ -149,10 +159,43 @@ typedef struct lwesp_wifi_command_s {
 	lwesp_resp_t (*lwesp_set_auto_conn_ap)      (uint8_t status);
 } lwesp_wifi_command_t;
 
+
+typedef struct lwesp_tcp_at_conn_s {
+#if LWESP_CHIP_ESP8266 == 1
+	uint8_t stat[2];
+#endif
+	uint8_t link_id[2];
+	uint8_t conn_type[4];
+	uint8_t remote_ip[20];
+	uint8_t remote_port[6];
+	uint8_t local_port[6];
+	uint8_t type[10];
+} lwesp_tcp_at_conn_t;
+
+typedef struct lwesp_tcp_at_domain_s {
+	uint8_t domain_name[50];
+	uint8_t domain_ip[20];
+} lwesp_tcp_at_domain_t;
+
+typedef struct lwesp_tcp_at_ping_s {
+	uint8_t ip[20];
+	uint8_t time[10];
+} lwesp_tcp_at_ping_t;
+
+typedef struct lwesp_tcp_command_s {
+	lwesp_resp_t (*lwesp_check_conn_status)			(lwesp_tcp_at_conn_t *conn);
+	lwesp_resp_t (*lwesp_resolve_domain)				(lwesp_tcp_at_domain_t *domain);
+	lwesp_resp_t (*lwesp_ping_ip)								(lwesp_tcp_at_ping_t *ping);
+	lwesp_resp_t (*lwesp_set_transmission_mode)	(lwesp_at_transmission_mode_t mode);
+	lwesp_resp_t (*lwesp_set_connection_type)		(lwesp_at_connection_type_t ping);
+} lwesp_tcp_command_t;
+
 typedef struct lwesp_client_s {
 	lwesp_basic_command_t basic;
 	lwesp_wifi_command_t  wifi;
+	lwesp_tcp_command_t   tcp;
 } lwesp_client_t;
+
 
 typedef struct lwesp_ll_s {
 	lwesp_resp_t (*lwesp_ll_configure_uart_clock)(void);

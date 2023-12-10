@@ -383,8 +383,6 @@ void lwesp_sys_at_get_ip_sta(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st)
 	}
 
 }
-
-
 #endif
 
 void lwesp_sys_at_get_list_ap(void) {
@@ -416,13 +414,13 @@ void lwesp_sys_at_get_list_ap(void) {
 
 void lwesp_sys_at_check_soft_ap_devices(void) {
 		
-	char* token;
 	char* rest = (char *)lwesp_response_buffer;
+
+#if LWESP_CHIP_ESP8266 == 1
+	char* token;
 	
 	while ((token = strtok_r(rest, "\n", &rest))) {
-		
-#if LWESP_CHIP_ESP8266 == 1
-		
+	
 		char* key = strtok(token, ",");
 		char* value = strtok(NULL, ",");
 		
@@ -432,15 +430,51 @@ void lwesp_sys_at_check_soft_ap_devices(void) {
 			sprintf(data, "%s,%s", key, value);
 			lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, data);
 		}
+	}
 #endif
 
 #if LWESP_CHIP_ESP32 == 1
 		
-		// TODO
+	// TODO
 		
-		#endif
-	}
+#endif
+
 }
+
+void lwesp_sys_at_get_conn_stat(lwesp_tcp_at_conn_t *conn) {
+
+	char* rest = (char *)lwesp_response_buffer;
+		
+#if LWESP_CHIP_ESP8266 == 1
+	sscanf(rest, "STATUS:%s", conn->stat);
+#endif
+	sscanf(rest, "+CIPSTATE:%s,\"%[^\"]\",\"%[^\"]\",%s,%s,\"%[^\"]\"", conn->link_id, conn->type, conn->remote_ip, conn->remote_port, conn->local_port, conn->type);
+	
+}
+
+void lwesp_sys_at_get_domain_name(lwesp_tcp_at_domain_t *domain) {
+	
+	if (sscanf((char *)lwesp_response_buffer, "+CIPDOMAIN:%s", domain->domain_ip) == 1) {
+			//
+	} 
+}
+
+void lwesp_sys_at_get_ping_time(lwesp_tcp_at_ping_t *ping) {
+		
+	#if LWESP_CHIP_ESP8266 == 1
+	if (sscanf((char *)lwesp_response_buffer, "+%s", ping->time) == 1) {
+			//
+	} 
+
+	#endif
+	#if LWESP_CHIP_ESP32 == 1
+	if (sscanf((char *)lwesp_response_buffer, "+PING:%s", ping->time) == 1) {
+			//
+	} 
+	#endif
+}
+
+
 
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	
