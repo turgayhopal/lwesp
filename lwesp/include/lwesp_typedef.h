@@ -57,7 +57,7 @@ typedef enum lwesp_at_echo_e{
 typedef struct lwesp_at_parameter_s {
 	lwesp_cmd_type_t cmd_type;
 	uint8_t cmd_key[30];
-	uint8_t cmd_params[30];
+	uint8_t cmd_params[100];
 } lwesp_at_parameter_t;
 
 typedef struct lwesp_basic_at_version_s {
@@ -106,6 +106,12 @@ typedef struct lwesp_wifi_at_mac_s {
 	uint8_t mac_addr[20];
 }lwesp_wifi_at_mac_t;
 
+typedef struct lwesp_wifi_at_ip_s {
+	uint8_t ip[20];
+	uint8_t gateway[20];
+	uint8_t netmask[20];
+}lwesp_wifi_at_ip_t;
+
 
 typedef struct lwesp_wifi_command_s {
 #if LWESP_CHIP_ESP8266 == 1
@@ -117,6 +123,10 @@ typedef struct lwesp_wifi_command_s {
 	lwesp_resp_t (*lwesp_set_sta_mac)   	(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_st);
 	lwesp_resp_t (*lwesp_check_ap_mac)   	(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st);
 	lwesp_resp_t (*lwesp_set_ap_mac)   		(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_set_ap_ip)       (lwesp_wifi_at_ip_t ip_addr, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_check_ap_ip)     (lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_set_sta_ip)      (lwesp_wifi_at_ip_t ip_addr, uint8_t save_flash_st);
+	lwesp_resp_t (*lwesp_check_sta_ip)    (lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st);
 #endif
 #if LWESP_CHIP_ESP32 == 1
 	lwesp_resp_t (*lwesp_set_wifi_mode)	 	(lwesp_wifi_at_wifi_mode_t wifi_mode);
@@ -127,6 +137,10 @@ typedef struct lwesp_wifi_command_s {
 	lwesp_resp_t (*lwesp_set_sta_mac)   	(lwesp_wifi_at_mac_t mac_addr);
 	lwesp_resp_t (*lwesp_check_ap_mac)   	(lwesp_wifi_at_mac_t *mac_addr);
 	lwesp_resp_t (*lwesp_set_ap_mac)   		(lwesp_wifi_at_mac_t mac_addr);
+	lwesp_resp_t (*lwesp_set_ap_ip)       (lwesp_wifi_at_ip_t ip_addr);
+	lwesp_resp_t (*lwesp_check_ap_ip)     (lwesp_wifi_at_ip_t *ip_addr);
+	lwesp_resp_t (*lwesp_set_sta_ip)      (lwesp_wifi_at_ip_t ip_addr);
+	lwesp_resp_t (*lwesp_check_sta_ip)    (lwesp_wifi_at_ip_t *ip_addr);
 	
 #endif
 	lwesp_resp_t (*lwesp_list_aps) 							(void);

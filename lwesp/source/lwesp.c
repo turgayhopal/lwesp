@@ -29,6 +29,10 @@ lwesp_resp_t lwesp_init(lwesp_client_t *client, lwesp_resp_wifi_callback wifi_ca
 	client->wifi.lwesp_check_sta_mac = lwesp_check_sta_mac;
 	client->wifi.lwesp_set_ap_mac = lwesp_set_ap_mac;
 	client->wifi.lwesp_check_ap_mac = lwesp_check_ap_mac;
+	client->wifi.lwesp_set_sta_ip = lwesp_set_sta_ip;
+	client->wifi.lwesp_check_sta_ip = lwesp_check_sta_ip;
+	client->wifi.lwesp_set_ap_ip = lwesp_set_ap_ip;
+	client->wifi.lwesp_check_ap_ip = lwesp_check_ap_ip;
 	
 	lwesp_sys_init();
 	lwesp_sys_set_resp_wifi_callback(wifi_callback);

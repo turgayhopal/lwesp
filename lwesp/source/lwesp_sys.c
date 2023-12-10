@@ -187,6 +187,53 @@ void lwesp_sys_at_get_mac_sta(lwesp_wifi_at_mac_t *mac_addr) {
 	}
 }
 
+void lwesp_sys_at_get_ip_ap(lwesp_wifi_at_ip_t *ip_addr) {
+		
+	char *current = (char *)lwesp_response_buffer;
+    
+	while ((current = strstr(current, "CIPAP:")) != NULL) {
+		if (strstr(current, "ip:") != NULL) {
+			if (sscanf(current, "CIPAP:ip:\"%15[^\"]\"", ip_addr->ip) != 1) {
+				//
+			}
+		} else if (strstr(current, "gateway:") != NULL) {
+			if (sscanf(current, "CIPAP:gateway:\"%15[^\"]\"", ip_addr->gateway) != 1) {
+				//
+			}
+		} else if (strstr(current, "netmask:") != NULL) {
+			if (sscanf(current, "CIPAP:netmask:\"%15[^\"]\"", ip_addr->netmask) != 1) {
+				//
+			}
+		}
+		current++;
+	}
+	
+}
+
+
+void lwesp_sys_at_get_ip_sta(lwesp_wifi_at_ip_t *ip_addr) {
+	
+	char *current = (char *)lwesp_response_buffer;
+    
+	while ((current = strstr(current, "CIPSTA:")) != NULL) {
+		if (strstr(current, "ip:") != NULL) {
+			if (sscanf(current, "CIPSTA:ip:\"%15[^\"]\"", ip_addr->ip) != 1) {
+				//
+			}
+		} else if (strstr(current, "gateway:") != NULL) {
+			if (sscanf(current, "CIPSTA:gateway:\"%15[^\"]\"", ip_addr->gateway) != 1) {
+				//
+			}
+		} else if (strstr(current, "netmask:") != NULL) {
+			if (sscanf(current, "CIPSTA:netmask:\"%15[^\"]\"", ip_addr->netmask) != 1) {
+				//
+			}
+		}
+		current++;
+	}
+	
+}
+
 #endif
 
 #if LWESP_CHIP_ESP8266 == 1
@@ -253,6 +300,88 @@ void lwesp_sys_at_get_mac_sta(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_
 			} 
 		}
 	}
+}
+
+void lwesp_sys_at_get_ip_ap(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st) {
+	
+	char *current = (char *)lwesp_response_buffer;
+    
+	while ((current = strstr(current, "CIPAP_CUR:")) != NULL) {
+		if (strstr(current, "ip:") != NULL) {
+			if (save_flash_st) {
+				if (sscanf(current, "CIPAP_DEF:ip:\"%15[^\"]\"", ip_addr->ip) != 1) {
+				//
+				}
+			} else {
+				if (sscanf(current, "CIPAP_CUR:ip:\"%15[^\"]\"", ip_addr->ip) != 1) {
+				//
+				}
+			}
+		} else if (strstr(current, "gateway:") != NULL) {
+			if (save_flash_st) {
+				if (sscanf(current, "CIPAP_DEF:gateway:\"%15[^\"]\"", ip_addr->gateway) != 1) {
+				//
+				}
+			} else {
+				if (sscanf(current, "CIPAP_CUR:gateway:\"%15[^\"]\"", ip_addr->gateway) != 1) {
+				//
+				}
+			}
+		} else if (strstr(current, "netmask:") != NULL) {
+			if (save_flash_st) {
+				if (sscanf(current, "CIPAP_DEF:netmask:\"%15[^\"]\"", ip_addr->netmask) != 1) {
+				//
+				}
+			} else {
+				if (sscanf(current, "CIPAP_CUR:netmask:\"%15[^\"]\"", ip_addr->netmask) != 1) {
+				//
+				}
+			}
+		}
+		current++;
+	}
+	
+}
+
+void lwesp_sys_at_get_ip_sta(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st) {
+	
+	char *current = (char *)lwesp_response_buffer;
+    
+	while ((current = strstr(current, "CIPSTA_CUR:")) != NULL) {
+		if (strstr(current, "ip:") != NULL) {
+			if (save_flash_st) {
+				if (sscanf(current, "CIPSTA_DEF:ip:\"%15[^\"]\"", ip_addr->ip) != 1) {
+				//
+				}
+			} else {
+				if (sscanf(current, "CIPSTA_CUR:ip:\"%15[^\"]\"", ip_addr->ip) != 1) {
+				//
+				}
+			}
+		} else if (strstr(current, "gateway:") != NULL) {
+			if (save_flash_st) {
+				if (sscanf(current, "CIPSTA_DEF:gateway:\"%15[^\"]\"", ip_addr->gateway) != 1) {
+				//
+				}
+			} else {
+				if (sscanf(current, "CIPSTA_CUR:gateway:\"%15[^\"]\"", ip_addr->gateway) != 1) {
+				//
+				}
+			}
+		} else if (strstr(current, "netmask:") != NULL) {
+			if (save_flash_st) {
+				if (sscanf(current, "CIPSTA_DEF:netmask:\"%15[^\"]\"", ip_addr->netmask) != 1) {
+				//
+				}
+			} else {
+				if (sscanf(current, "CIPSTA_CUR:netmask:\"%15[^\"]\"", ip_addr->netmask) != 1) {
+				//
+				}
+			}
+		}
+		current++;
+	}
+
 }
 
 

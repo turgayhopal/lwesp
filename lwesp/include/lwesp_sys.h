@@ -42,12 +42,16 @@ void lwesp_sys_at_get_sleep_mode(lwesp_basic_at_sleep_mode_t *sleep_mode);
 void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t save_flash_st);
 void lwesp_sys_at_get_mac_ap(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st);
 void lwesp_sys_at_get_mac_sta(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st);
+void lwesp_sys_at_get_ip_ap(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st);
+void lwesp_sys_at_get_ip_sta(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st);
 #endif
 
 #if LWESP_CHIP_ESP32 == 1
 void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode);
 void lwesp_sys_at_get_mac_ap(lwesp_wifi_at_mac_t *mac_addr);
 void lwesp_sys_at_get_mac_sta(lwesp_wifi_at_mac_t *mac_addr);
+void lwesp_sys_at_get_ip_ap(lwesp_wifi_at_ip_t *ip_addr);
+void lwesp_sys_at_get_ip_sta(lwesp_wifi_at_ip_t *ip_addr);
 #endif
 
 void lwesp_sys_at_get_list_ap(void);

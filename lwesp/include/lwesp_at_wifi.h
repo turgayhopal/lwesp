@@ -20,6 +20,10 @@ lwesp_resp_t lwesp_check_sta_mac(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_fla
 lwesp_resp_t lwesp_set_sta_mac(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_st);
 lwesp_resp_t lwesp_check_ap_mac(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st);
 lwesp_resp_t lwesp_set_ap_mac(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_st);
+lwesp_resp_t lwesp_set_ap_ip(lwesp_wifi_at_ip_t ip_addr, uint8_t save_flash_st);
+lwesp_resp_t lwesp_check_ap_ip(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st);
+lwesp_resp_t lwesp_set_sta_ip(lwesp_wifi_at_ip_t ip_addr, uint8_t save_flash_st);
+lwesp_resp_t lwesp_check_sta_ip(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st);
 #endif 
 
 #if LWESP_CHIP_ESP32 == 1
@@ -31,6 +35,10 @@ lwesp_resp_t lwesp_check_sta_mac(lwesp_wifi_at_mac_t *mac_addr);
 lwesp_resp_t lwesp_set_sta_mac(lwesp_wifi_at_mac_t mac_addr);
 lwesp_resp_t lwesp_check_ap_mac(lwesp_wifi_at_mac_t *mac_addr);
 lwesp_resp_t lwesp_set_ap_mac(lwesp_wifi_at_mac_t mac_addr);
+lwesp_resp_t lwesp_set_ap_ip(lwesp_wifi_at_ip_t ip_addr);
+lwesp_resp_t lwesp_check_ap_ip(lwesp_wifi_at_ip_t *ip_addr);
+lwesp_resp_t lwesp_set_sta_ip(lwesp_wifi_at_ip_t ip_addr);
+lwesp_resp_t lwesp_check_sta_ip(lwesp_wifi_at_ip_t *ip_addr);
 #endif
 
 lwesp_resp_t lwesp_list_aps(void);

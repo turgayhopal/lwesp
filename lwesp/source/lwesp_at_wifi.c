@@ -85,6 +85,31 @@ static lwesp_at_parameter_t wifi_at_check_ap_mac_p = {
 	.cmd_params = NULL
 };
 
+static lwesp_at_parameter_t wifi_at_set_ap_ip_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPAP",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_check_ap_ip_p = {
+	.cmd_type = LWESP_CMD_TYPE_QUERY,
+	.cmd_key  = "AT+CIPAP",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_set_sta_ip_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPSTA",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_check_sta_ip_p = {
+	.cmd_type = LWESP_CMD_TYPE_QUERY,
+	.cmd_key  = "AT+CIPSTA",
+	.cmd_params = NULL
+};
+
+
 lwesp_resp_t LWESP_WIFI_AWAIT_RESP(uint32_t ms) {
 	
 	TickType_t ticks = xTaskGetTickCount();
@@ -227,7 +252,7 @@ lwesp_resp_t lwesp_set_sta_mac(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_
 		sprintf((char *)wifi_at_set_sta_mac_p.cmd_key, "%s_CUR", wifi_at_set_sta_mac_p.cmd_key);
 	}
 
-	sprintf((char *)wifi_at_set_sta_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	sprintf((char *)wifi_at_set_sta_mac_p.cmd_params, "\"%s\"", mac_addr.mac_addr);
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_set_sta_mac_p);
@@ -264,12 +289,86 @@ lwesp_resp_t lwesp_set_ap_mac(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_s
 		sprintf((char *)wifi_at_set_ap_mac_p.cmd_key, "%s_CUR", wifi_at_set_ap_mac_p.cmd_key);
 	}
 
-	sprintf((char *)wifi_at_set_ap_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	sprintf((char *)wifi_at_set_ap_mac_p.cmd_params, "\"%s\"", mac_addr.mac_addr);
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_set_ap_mac_p);
 	
 	return LWESP_WIFI_AWAIT_RESP(1000);
+	
+}
+
+lwesp_resp_t lwesp_set_ap_ip(lwesp_wifi_at_ip_t ip_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_set_ap_ip_p.cmd_key, "%s_DEF", wifi_at_set_ap_ip_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_set_ap_ip_p.cmd_key, "%s_CUR", wifi_at_set_ap_ip_p.cmd_key);
+	}
+
+	sprintf((char *)wifi_at_set_ap_ip_p.cmd_params, "\"%s\",\"%s\",\"%s\"", ip_addr.ip, ip_addr.gateway, ip_addr.netmask);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_ap_ip_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+	
+}
+
+lwesp_resp_t lwesp_check_ap_ip(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_check_ap_ip_p.cmd_key, "%s_DEF", wifi_at_check_ap_ip_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_check_ap_ip_p.cmd_key, "%s_CUR", wifi_at_check_ap_ip_p.cmd_key);
+	}
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_ap_ip_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_ip_ap(ip_addr, save_flash_st);
+	}
+
+	return lwesp_at_resp_flag;
+}
+
+lwesp_resp_t lwesp_set_sta_ip(lwesp_wifi_at_ip_t ip_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_set_sta_ip_p.cmd_key, "%s_DEF", wifi_at_set_sta_ip_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_set_sta_ip_p.cmd_key, "%s_CUR", wifi_at_set_sta_ip_p.cmd_key);
+	}
+
+	sprintf((char *)wifi_at_set_sta_ip_p.cmd_params, "\"%s\",\"%s\",\"%s\"", ip_addr.ip, ip_addr.gateway, ip_addr.netmask);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_sta_ip_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+}
+
+lwesp_resp_t lwesp_check_sta_ip(lwesp_wifi_at_ip_t *ip_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_check_sta_ip_p.cmd_key, "%s_DEF", wifi_at_check_sta_ip_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_check_sta_ip_p.cmd_key, "%s_CUR", wifi_at_check_sta_ip_p.cmd_key);
+	}
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_sta_ip_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_ip_sta(ip_addr, save_flash_st);
+	}
+
+	return lwesp_at_resp_flag;
 	
 }
 
@@ -340,7 +439,7 @@ lwesp_resp_t lwesp_check_sta_mac(lwesp_wifi_at_mac_t *mac_addr) {
 
 lwesp_resp_t lwesp_set_sta_mac(lwesp_wifi_at_mac_t mac_addr) {
 	
-	sprintf((char *)wifi_at_set_sta_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	sprintf((char *)wifi_at_set_sta_mac_p.cmd_params, "\"%s\"", mac_addr.mac_addr);
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_set_sta_mac_p);
@@ -365,14 +464,64 @@ lwesp_resp_t lwesp_check_ap_mac(lwesp_wifi_at_mac_t *mac_addr) {
 
 lwesp_resp_t lwesp_set_ap_mac(lwesp_wifi_at_mac_t mac_addr) {
 	
-	sprintf((char *)wifi_at_set_ap_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	sprintf((char *)wifi_at_set_ap_mac_p.cmd_params, "\"%s\"", mac_addr.mac_addr);
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_set_ap_mac_p);
 	
+	return LWESP_WIFI_AWAIT_RESP(1000);	
+}
+
+lwesp_resp_t lwesp_set_ap_ip(lwesp_wifi_at_ip_t ip_addr) {
+	
+	sprintf((char *)wifi_at_set_ap_ip_p.cmd_params, "\"%s\",\"%s\",\"%s\"", ip_addr.ip, ip_addr.gateway, ip_addr.netmask);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_ap_ip_p);
+	
 	return LWESP_WIFI_AWAIT_RESP(1000);
 	
 }
+
+lwesp_resp_t lwesp_check_ap_ip(lwesp_wifi_at_ip_t *ip_addr) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_ap_ip_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_ip_ap(ip_addr);
+	}
+
+	return lwesp_at_resp_flag;
+}
+
+lwesp_resp_t lwesp_set_sta_ip(lwesp_wifi_at_ip_t ip_addr) {
+	
+	sprintf((char *)wifi_at_set_sta_ip_p.cmd_params, "\"%s\",\"%s\",\"%s\"", ip_addr.ip, ip_addr.gateway, ip_addr.netmask);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_sta_ip_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+}
+
+lwesp_resp_t lwesp_check_sta_ip(lwesp_wifi_at_ip_t *ip_addr) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_sta_ip_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_ip_sta(ip_addr);
+	}
+
+	return lwesp_at_resp_flag;
+	
+}
+
 
 #endif
 
