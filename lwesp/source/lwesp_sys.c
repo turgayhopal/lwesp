@@ -163,6 +163,30 @@ void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode) {
 	}
 }
 
+void lwesp_sys_at_get_mac_ap(lwesp_wifi_at_mac_t *mac_addr) {
+
+	char* rest = (char *)lwesp_response_buffer;
+	
+	char* mac_start = strstr(rest, "+CIPAPMAC:");
+	if (mac_start != NULL) {
+		if (sscanf(mac_start, "+CIPAPMAC:\"%17[^\"\n]", mac_addr->mac_addr) == 1) {
+			// 
+		} 
+	}
+}
+
+void lwesp_sys_at_get_mac_sta(lwesp_wifi_at_mac_t *mac_addr) {
+
+	char* rest = (char *)lwesp_response_buffer;
+	
+	char* mac_start = strstr(rest, "+CIPSTAMAC:");
+	if (mac_start != NULL) {
+		if (sscanf(mac_start, "+CIPSTAMAC:\"%17[^\"\n]", mac_addr->mac_addr) == 1) {
+			// 
+		} 
+	}
+}
+
 #endif
 
 #if LWESP_CHIP_ESP8266 == 1
@@ -187,6 +211,50 @@ void lwesp_sys_at_get_wifi_mode(lwesp_wifi_at_wifi_mode_t *wifi_mode, uint8_t sa
 		}
 	}
 }
+
+void lwesp_sys_at_get_mac_ap(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st) {
+
+	char* rest = (char *)lwesp_response_buffer;
+
+	if (save_flash_st) {
+		char* mac_start = strstr(rest, "+CIPAPMAC_DEF:");
+		if (mac_start != NULL) {
+			if (sscanf(mac_start, "+CIPAPMAC_DEF:\"%17[^\"\n]", mac_addr->mac_addr) == 1) {
+				// 
+			} 
+		} 
+	} else {
+		char* mac_start = strstr(rest, "+CIPAPMAC_CUR:");
+		if (mac_start != NULL) {
+			if (sscanf(mac_start, "+CIPAPMAC_CUR:\"%17[^\"\n]", mac_addr->mac_addr) == 1) {
+				// 
+			} 
+		}
+	}
+
+}
+
+void lwesp_sys_at_get_mac_sta(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st) {
+
+	char* rest = (char *)lwesp_response_buffer;
+	
+	if (save_flash_st) {
+		char* mac_start = strstr(rest, "+CIPSTAMAC_DEF:");
+		if (mac_start != NULL) {
+			if (sscanf(mac_start, "+CIPSTAMAC_DEF:\"%17[^\"\n]", mac_addr->mac_addr) == 1) {
+				// 
+			} 
+		} 
+	} else {
+		char* mac_start = strstr(rest, "+CIPSTAMAC_CUR:");
+		if (mac_start != NULL) {
+			if (sscanf(mac_start, "+CIPSTAMAC_CUR:\"%17[^\"\n]", mac_addr->mac_addr) == 1) {
+				// 
+			} 
+		}
+	}
+}
+
 
 #endif
 
@@ -217,6 +285,33 @@ void lwesp_sys_at_get_list_ap(void) {
 	
 }
 
+void lwesp_sys_at_check_soft_ap_devices(void) {
+		
+	char* token;
+	char* rest = (char *)lwesp_response_buffer;
+	
+	while ((token = strtok_r(rest, "\n", &rest))) {
+		
+#if LWESP_CHIP_ESP8266 == 1
+		
+		char* key = strtok(token, ",");
+		char* value = strtok(NULL, ",");
+		
+		if (key != NULL && value != NULL) {
+			
+			char data[50];
+			sprintf(data, "%s,%s", key, value);
+			lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, data);
+		}
+#endif
+
+#if LWESP_CHIP_ESP32 == 1
+		
+		// TODO
+		
+		#endif
+	}
+}
 
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	

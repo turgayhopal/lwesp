@@ -7,7 +7,6 @@
 
 static volatile lwesp_resp_t lwesp_at_resp_flag;
 
-
 static lwesp_at_parameter_t wifi_at_check_wifi_mode_p = {
 	.cmd_type = LWESP_CMD_TYPE_QUERY,
 	.cmd_key  = "AT+CWMODE",
@@ -47,6 +46,42 @@ static lwesp_at_parameter_t wifi_at_disconnect_ap_p = {
 static lwesp_at_parameter_t wifi_at_create_soft_ap_p = {
 	.cmd_type = LWESP_CMD_TYPE_SET,
 	.cmd_key  = "AT+CWSAP",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_check_soft_ap_p = {
+	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
+	.cmd_key  = "AT+CWLIF",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_set_auto_conn_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CWAUTOCONN",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_set_sta_mac_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPSTAMAC",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_check_sta_mac_p = {
+	.cmd_type = LWESP_CMD_TYPE_QUERY,
+	.cmd_key  = "AT+CIPSTAMAC",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_set_ap_mac_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPAPMAC",
+	.cmd_params = NULL
+};
+
+static lwesp_at_parameter_t wifi_at_check_ap_mac_p = {
+	.cmd_type = LWESP_CMD_TYPE_QUERY,
+	.cmd_key  = "AT+CIPAPMAC",
 	.cmd_params = NULL
 };
 
@@ -163,6 +198,81 @@ lwesp_resp_t lwesp_create_soft_ap(lwesp_wifi_at_create_soft_ap_t soft_ap, uint8_
 	return LWESP_WIFI_AWAIT_RESP(1000);
 }
 
+lwesp_resp_t lwesp_check_sta_mac(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_check_sta_mac_p.cmd_key, "%s_DEF", wifi_at_check_sta_mac_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_check_sta_mac_p.cmd_key, "%s_CUR", wifi_at_check_sta_mac_p.cmd_key);
+	}
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_sta_mac_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_mac_sta(mac_addr, save_flash_st);
+	}
+
+	return lwesp_at_resp_flag;
+
+}
+
+lwesp_resp_t lwesp_set_sta_mac(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_set_sta_mac_p.cmd_key, "%s_DEF", wifi_at_set_sta_mac_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_set_sta_mac_p.cmd_key, "%s_CUR", wifi_at_set_sta_mac_p.cmd_key);
+	}
+
+	sprintf((char *)wifi_at_set_sta_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_sta_mac_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+	
+}
+
+lwesp_resp_t lwesp_check_ap_mac(lwesp_wifi_at_mac_t *mac_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_check_ap_mac_p.cmd_key, "%s_DEF", wifi_at_check_ap_mac_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_check_ap_mac_p.cmd_key, "%s_CUR", wifi_at_check_ap_mac_p.cmd_key);
+	}
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_ap_mac_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_mac_ap(mac_addr, save_flash_st);
+	}
+
+	return lwesp_at_resp_flag;
+}
+
+lwesp_resp_t lwesp_set_ap_mac(lwesp_wifi_at_mac_t mac_addr, uint8_t save_flash_st) {
+	
+	if (save_flash_st) {
+		sprintf((char *)wifi_at_set_ap_mac_p.cmd_key, "%s_DEF", wifi_at_set_ap_mac_p.cmd_key);
+	} else {
+		sprintf((char *)wifi_at_set_ap_mac_p.cmd_key, "%s_CUR", wifi_at_set_ap_mac_p.cmd_key);
+	}
+
+	sprintf((char *)wifi_at_set_ap_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_ap_mac_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+	
+}
+
 #endif
 
 #if LWESP_CHIP_ESP32 == 1
@@ -213,6 +323,57 @@ lwesp_resp_t lwesp_create_soft_ap(lwesp_wifi_at_create_soft_ap_t soft_ap) {
 	
 }
 
+lwesp_resp_t lwesp_check_sta_mac(lwesp_wifi_at_mac_t *mac_addr) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_sta_mac_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_mac_sta(mac_addr);
+	}
+
+	return lwesp_at_resp_flag;
+
+}
+
+lwesp_resp_t lwesp_set_sta_mac(lwesp_wifi_at_mac_t mac_addr) {
+	
+	sprintf((char *)wifi_at_set_sta_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_sta_mac_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+	
+}
+
+lwesp_resp_t lwesp_check_ap_mac(lwesp_wifi_at_mac_t *mac_addr) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_ap_mac_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(100);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_mac_ap(mac_addr);
+	}
+
+	return lwesp_at_resp_flag;
+}
+
+lwesp_resp_t lwesp_set_ap_mac(lwesp_wifi_at_mac_t mac_addr) {
+	
+	sprintf((char *)wifi_at_set_ap_mac_p.cmd_params, "%s", mac_addr.mac_addr);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_ap_mac_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
+	
+}
+
 #endif
 
 lwesp_resp_t lwesp_list_aps(void) {
@@ -235,6 +396,31 @@ lwesp_resp_t lwesp_disconnect_ap(void) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_disconnect_ap_p);
 	
-	return LWESP_WIFI_AWAIT_RESP(1000);;
+	return LWESP_WIFI_AWAIT_RESP(1000);
 	
+}
+
+lwesp_resp_t lwesp_check_soft_ap_devices(void) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_check_soft_ap_p);
+	
+	lwesp_at_resp_flag = LWESP_WIFI_AWAIT_RESP(1000);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_check_soft_ap_devices();
+	}
+
+	return lwesp_at_resp_flag;
+	
+}
+
+lwesp_resp_t lwesp_set_auto_conn_ap(uint8_t status) {
+	
+	sprintf((char *)wifi_at_set_auto_conn_p.cmd_params, "%d", status);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(wifi_at_set_auto_conn_p);
+	
+	return LWESP_WIFI_AWAIT_RESP(1000);
 }
