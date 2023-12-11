@@ -333,11 +333,11 @@ lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t *send_data) {
 	
 	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
 		lwesp_ll_send_data(send_data->data, strlen((char *)send_data->data));
-		lwesp_sys_at_get_tcp_response()
+		lwesp_sys_at_get_tcp_response(send_data);
 	}	
 
 	return lwesp_at_resp_flag;
 	
-	
+
 }
 

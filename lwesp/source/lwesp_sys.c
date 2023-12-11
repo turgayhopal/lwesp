@@ -488,7 +488,7 @@ lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void) {
 	}
 }
 
-void lwesp_sys_at_get_response(lwesp_tcp_at_send_data_t *data) {
+void lwesp_sys_at_get_tcp_response(lwesp_tcp_at_send_data_t *data) {
 	printf("%s", lwesp_response_buffer);
 }
 
