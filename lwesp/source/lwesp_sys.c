@@ -435,7 +435,11 @@ void lwesp_sys_at_check_soft_ap_devices(void) {
 
 #if LWESP_CHIP_ESP32 == 1
 		
-	// TODO
+		char ip_address[20], mac_address[20];
+    sscanf(rest, "+CWLIF:%[^,],%s", ip_address, mac_address);
+		char data[50];
+		sprintf(data, "%s,%s", ip_address, mac_address);
+		lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, data);
 		
 #endif
 
