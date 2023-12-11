@@ -1,3 +1,4 @@
+
 // Header: LWESP Source File
 // File Name: lwesp.c
 // Author: Turgay Hopal
@@ -39,8 +40,16 @@ lwesp_resp_t lwesp_init(lwesp_client_t *client, lwesp_resp_wifi_callback wifi_ca
 	client->tcp.lwesp_ping_ip = lwesp_ping_ip;
 	client->tcp.lwesp_set_connection_type = lwesp_set_connection_type;
 	client->tcp.lwesp_set_transmission_mode = lwesp_set_transmission_mode;
-	client->tcp.lwesp_start_connection = lwesp_start_connection;
 	
+#if LWESP_CHIP_ESP8266 == 1
+	client->tcp.lwesp_set_ssl_size = lwesp_set_ssl_size;
+#endif
+
+	client->tcp.lwesp_start_tcp_connection = lwesp_start_tcp_connection;
+	client->tcp.lwesp_start_udp_connection = lwesp_start_udp_connection;
+	client->tcp.lwesp_start_ssl_connection = lwesp_start_ssl_connection;
+	client->tcp.lwesp_close_connection = lwesp_close_connection;
+	client->tcp.lwesp_send_data = lwesp_send_data;
 	
 	lwesp_sys_init();
 	lwesp_sys_set_resp_wifi_callback(wifi_callback);

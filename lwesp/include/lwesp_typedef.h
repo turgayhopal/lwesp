@@ -1,3 +1,4 @@
+
 // Header: LWESP Typedef Header File
 // File Name: lwesp.h
 // Author: Turgay Hopal
@@ -45,7 +46,8 @@ typedef enum lwesp_resp_wifi_e {
 typedef enum lwesp_resp_tcp_e {
 	LWESP_RESP_CONNECT = 0x40,
 	LWESP_RESP_ALREADY_CONNECT,
-	LWESP_RESP_CLOSED
+	LWESP_RESP_CLOSED,
+	LWESP_RESP_SEND_READY,
 } lwesp_resp_tcp_t;
 
 typedef enum lwesp_cmd_type_e{
@@ -188,6 +190,11 @@ typedef struct lwesp_tcp_at_ping_s {
 	uint8_t time[10];
 } lwesp_tcp_at_ping_t;
 
+#if LWESP_CHIP_ESP8266 == 1
+typedef struct lwesp_tcp_at_set_ssl_size_s {
+	uint8_t size[6];
+} lwesp_tcp_at_set_ssl_size_t;
+#endif
 typedef struct lwesp_tcp_at_start_tcp_conn_s {
 	uint8_t link_id[2];
 	uint8_t type[10];
@@ -196,13 +203,42 @@ typedef struct lwesp_tcp_at_start_tcp_conn_s {
 	uint8_t keep_alive[6];
 } lwesp_tcp_at_start_tcp_conn_t;
 
+typedef struct lwesp_tcp_at_start_udp_conn_s {
+	uint8_t link_id[2];
+	uint8_t type[10];
+	uint8_t remote_host[50];
+	uint8_t remote_port[6];
+	uint8_t local_port[6];
+	uint8_t udp_mode[2];
+} lwesp_tcp_at_start_udp_conn_t;
+
+typedef struct lwesp_tcp_at_start_ssl_conn_s {
+	uint8_t link_id[2];
+	uint8_t type[10];
+	uint8_t remote_host[50];
+	uint8_t remote_port[6];
+	uint8_t keep_alive[6];
+} lwesp_tcp_at_start_ssl_conn_t;
+
+typedef struct lwesp_tcp_at_send_data_s {
+	uint8_t data[512];
+	uint8_t response[1024];
+} lwesp_tcp_at_send_data_t;
+
 typedef struct lwesp_tcp_command_s {
 	lwesp_resp_t (*lwesp_check_conn_status)			(lwesp_tcp_at_conn_t *conn);
 	lwesp_resp_t (*lwesp_resolve_domain)				(lwesp_tcp_at_domain_t *domain);
 	lwesp_resp_t (*lwesp_ping_ip)								(lwesp_tcp_at_ping_t *ping);
 	lwesp_resp_t (*lwesp_set_transmission_mode)	(lwesp_at_transmission_mode_t mode);
 	lwesp_resp_t (*lwesp_set_connection_type)		(lwesp_at_connection_type_t type);
-	lwesp_resp_t (*lwesp_start_connection)      (lwesp_tcp_at_start_tcp_conn_t start_conn, lwesp_at_connection_type_t type);
+#if LWESP_CHIP_ESP8266 == 1
+	lwesp_resp_t (*lwesp_set_ssl_size)				  (lwesp_tcp_at_set_ssl_size_t ssl);
+#endif
+	lwesp_resp_t (*lwesp_start_tcp_connection)  (lwesp_tcp_at_start_tcp_conn_t start_conn, lwesp_at_connection_type_t type);
+	lwesp_resp_t (*lwesp_start_udp_connection)  (lwesp_tcp_at_start_udp_conn_t start_conn, lwesp_at_connection_type_t type);
+	lwesp_resp_t (*lwesp_start_ssl_connection)  (lwesp_tcp_at_start_ssl_conn_t start_conn, lwesp_at_connection_type_t type);
+	lwesp_resp_t (*lwesp_close_connection)      (uint8_t *link_id, lwesp_at_connection_type_t type);
+	lwesp_resp_t (*lwesp_send_data)             (lwesp_tcp_at_send_data_t *send_data);
 } lwesp_tcp_command_t;
 
 typedef struct lwesp_client_s {

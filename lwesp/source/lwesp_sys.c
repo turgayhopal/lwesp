@@ -75,7 +75,7 @@ void vRxHandlerTask(void *pvParameters) {
 				lwesp_queue_flush(&lwesp_queue_rx);
 				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, NULL);
 			}
-	
+			
 			vTaskDelay(1);
 		}
 	}
@@ -488,6 +488,10 @@ lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void) {
 	}
 }
 
+void lwesp_sys_at_get_response(lwesp_tcp_at_send_data_t *data) {
+	printf("%s", lwesp_response_buffer);
+}
+
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	
 	memset(lwesp_sys_tx_buffer, 0x00, LWESP_SYS_TX_BUFFER_SIZE);
@@ -507,4 +511,3 @@ void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	}
 	lwesp_ll_send_data(lwesp_sys_tx_buffer, strlen((char *)lwesp_sys_tx_buffer));
 }
-
