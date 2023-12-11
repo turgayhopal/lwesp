@@ -341,4 +341,6 @@ lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t *send_data) {
 }
 
 
-
+	return lwesp_at_resp_flag;
+	
+}

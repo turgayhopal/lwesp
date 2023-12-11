@@ -435,7 +435,11 @@ void lwesp_sys_at_check_soft_ap_devices(void) {
 
 #if LWESP_CHIP_ESP32 == 1
 		
-	// TODO
+		char ip_address[20], mac_address[20];
+    sscanf(rest, "+CWLIF:%[^,],%s", ip_address, mac_address);
+		char data[50];
+		sprintf(data, "%s,%s", ip_address, mac_address);
+		lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, data);
 		
 #endif
 
@@ -474,7 +478,15 @@ void lwesp_sys_at_get_ping_time(lwesp_tcp_at_ping_t *ping) {
 	#endif
 }
 
-
+lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void) {
+	if (strstr((char *)lwesp_response_buffer, "CONNECT") != NULL ) {
+		return LWESP_RESP_CONNECT;
+	}
+	
+	if (strstr((char *)lwesp_response_buffer, "ALREADY CONNECT") != NULL ) {
+		return LWESP_RESP_ALREADY_CONNECT;
+	}
+}
 
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	

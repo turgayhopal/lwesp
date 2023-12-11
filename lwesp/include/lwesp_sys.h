@@ -60,4 +60,6 @@ void lwesp_sys_at_get_conn_stat(lwesp_tcp_at_conn_t *conn);
 void lwesp_sys_at_get_domain_name(lwesp_tcp_at_domain_t *domain);
 void lwesp_sys_at_get_ping_time(lwesp_tcp_at_ping_t *ping);
 
+lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void);
+
 #endif /* INC_LWESP_SYS_H_ */
