@@ -478,7 +478,15 @@ void lwesp_sys_at_get_ping_time(lwesp_tcp_at_ping_t *ping) {
 	#endif
 }
 
-
+lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void) {
+	if (strstr((char *)lwesp_response_buffer, "CONNECT") != NULL ) {
+		return LWESP_RESP_CONNECT;
+	}
+	
+	if (strstr((char *)lwesp_response_buffer, "ALREADY CONNECT") != NULL ) {
+		return LWESP_RESP_ALREADY_CONNECT;
+	}
+}
 
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	

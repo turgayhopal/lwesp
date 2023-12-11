@@ -49,6 +49,12 @@ static lwesp_at_parameter_t tcp_at_ping_p = {
 	.cmd_params = NULL,
 };
 
+static lwesp_at_parameter_t tcp_at_start_conn_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPSTART",
+	.cmd_params = NULL,
+};
+
 
 lwesp_resp_t LWESP_TCP_AWAIT_RESP(uint32_t ms) {
 	
@@ -162,5 +168,29 @@ lwesp_resp_t lwesp_ping_ip(lwesp_tcp_at_ping_t *ping) {
 	
 }
 
+lwesp_resp_t lwesp_start_connection(lwesp_tcp_at_start_tcp_conn_t start_conn, lwesp_at_connection_type_t type) {
+	
+	if (type == LWESP_AT_CONN_TYPE_MULTIPLE) {
+		sprintf((char *)tcp_at_start_conn_p.cmd_params, "%s,\"%s\",\"%s\",%s,%s", start_conn.link_id, start_conn.type, 
+																																						  start_conn.remote_host, start_conn.remote_port, 
+																																							start_conn.keep_alive);
+	} else {
+		sprintf((char *)tcp_at_start_conn_p.cmd_params, "\"%s\",\"%s\",%s,%s", start_conn.type, 
+																																					 start_conn.remote_host, start_conn.remote_port, 
+																																					 start_conn.keep_alive);
+	}
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(tcp_at_start_conn_p);
+	
+	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(2000);
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		if (lwesp_sys_at_check_tcp_connection() != LWESP_RESP_CONNECT) {
+			lwesp_at_resp_flag = LWESP_RESP_ERR;
+		}
+	}
 
-
+	return lwesp_at_resp_flag;
+	
+}

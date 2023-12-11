@@ -29,11 +29,11 @@ typedef enum lwesp_resp_e{
 } lwesp_resp_t;	
 
 typedef enum lwesp_resp_basic_e {
-	LWESP_RESP_BASIC_READY
+	LWESP_RESP_BASIC_READY = 0x20
 } lwesp_resp_basic_t;
 
 typedef enum lwesp_resp_wifi_e {
-	LWESP_RESP_WIFI_DISCONNECT,
+	LWESP_RESP_WIFI_DISCONNECT = 0x30,
 	LWESP_RESP_WIFI_CONNECTED,
 	LWESP_RESP_WIFI_GOT_IP,
 	LWESP_RESP_WIFI_AP_FOUND,
@@ -41,6 +41,12 @@ typedef enum lwesp_resp_wifi_e {
 	LWESP_RESP_WIFI_STA_DISCONNECTED,
 	LWESP_RESP_WIFI_STA_GET_IP,
 } lwesp_resp_wifi_t;
+
+typedef enum lwesp_resp_tcp_e {
+	LWESP_RESP_CONNECT = 0x40,
+	LWESP_RESP_ALREADY_CONNECT,
+	LWESP_RESP_CLOSED
+} lwesp_resp_tcp_t;
 
 typedef enum lwesp_cmd_type_e{
 	LWESP_CMD_TYPE_TEST,
@@ -182,12 +188,21 @@ typedef struct lwesp_tcp_at_ping_s {
 	uint8_t time[10];
 } lwesp_tcp_at_ping_t;
 
+typedef struct lwesp_tcp_at_start_tcp_conn_s {
+	uint8_t link_id[2];
+	uint8_t type[10];
+	uint8_t remote_host[50];
+	uint8_t remote_port[6];
+	uint8_t keep_alive[6];
+} lwesp_tcp_at_start_tcp_conn_t;
+
 typedef struct lwesp_tcp_command_s {
 	lwesp_resp_t (*lwesp_check_conn_status)			(lwesp_tcp_at_conn_t *conn);
 	lwesp_resp_t (*lwesp_resolve_domain)				(lwesp_tcp_at_domain_t *domain);
 	lwesp_resp_t (*lwesp_ping_ip)								(lwesp_tcp_at_ping_t *ping);
 	lwesp_resp_t (*lwesp_set_transmission_mode)	(lwesp_at_transmission_mode_t mode);
-	lwesp_resp_t (*lwesp_set_connection_type)		(lwesp_at_connection_type_t ping);
+	lwesp_resp_t (*lwesp_set_connection_type)		(lwesp_at_connection_type_t type);
+	lwesp_resp_t (*lwesp_start_connection)      (lwesp_tcp_at_start_tcp_conn_t start_conn, lwesp_at_connection_type_t type);
 } lwesp_tcp_command_t;
 
 typedef struct lwesp_client_s {
