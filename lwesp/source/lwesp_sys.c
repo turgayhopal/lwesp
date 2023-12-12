@@ -45,6 +45,13 @@ void vRxHandlerTask(void *pvParameters) {
 				lwesp_queue_flush(&lwesp_queue_rx);
 				lwesp_sys.resp_callback(LWESP_RESP_ERR);
 			}
+			
+			if (strstr((char *)lwesp_queue_rx.data, "+IPD") != NULL ) {
+				memset(lwesp_response_buffer, 0x00, LWESP_SYS_RESP_BUFFER_SIZE);
+				sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
+				lwesp_queue_flush(&lwesp_queue_rx);
+				lwesp_sys.resp_callback(LWESP_RESP_RECV_IPD);
+			}		
 						
 			if (strstr((char *)lwesp_queue_rx.data, "WIFI DISCONNECT") != NULL ) {
 				lwesp_queue_flush(&lwesp_queue_rx);
@@ -75,7 +82,7 @@ void vRxHandlerTask(void *pvParameters) {
 				lwesp_queue_flush(&lwesp_queue_rx);
 				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, NULL);
 			}
-			
+				
 			vTaskDelay(1);
 		}
 	}
@@ -488,8 +495,21 @@ lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void) {
 	}
 }
 
-void lwesp_sys_at_get_tcp_response(lwesp_tcp_at_send_data_t *data) {
+void lwesp_sys_at_get_tcp_response(void) {
 	printf("%s", lwesp_response_buffer);
+	
+	char* token;
+	char* rest = (char *)lwesp_response_buffer;
+	
+	while ((token = strtok_r(rest, "\n", &rest))) {
+		char* key = strtok(token, ":");
+		char* value = strtok(NULL, ":");
+
+		if (key != NULL && value != NULL) {
+			printf("Key %s Value %s\r\n", key, value);
+		}
+	}
+	
 }
 
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {

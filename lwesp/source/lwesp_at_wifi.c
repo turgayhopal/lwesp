@@ -142,6 +142,8 @@ void lwesp_sys_resp_callback_wifi(lwesp_resp_t resp) {
 			break;
 		case LWESP_RESP_TIMEOUT:
 			break;
+		case LWESP_RESP_RECV_IPD:
+			break;
 		case LWESP_RESP_CONF_ERR:
 			lwesp_at_resp_flag = LWESP_RESP_CONF_ERR;
 			break;

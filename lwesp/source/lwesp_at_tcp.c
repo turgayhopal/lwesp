@@ -112,6 +112,9 @@ void lwesp_sys_resp_callback_tcp(lwesp_resp_t resp) {
 			break;
 		case LWESP_RESP_TIMEOUT:
 			break;
+		case LWESP_RESP_RECV_IPD:
+			lwesp_at_resp_flag = LWESP_RESP_RECV_IPD;
+			break;
 		case LWESP_RESP_CONF_ERR:
 			lwesp_at_resp_flag = LWESP_RESP_CONF_ERR;
 			break;
@@ -322,22 +325,30 @@ lwesp_resp_t lwesp_close_connection(uint8_t *link_id, lwesp_at_connection_type_t
 	
 }
 
-lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t *send_data) {
+lwesp_resp_t lwesp_send_data_lenght(lwesp_tcp_at_send_data_t send_data) {
 	
-	sprintf((char *)tcp_at_send_data_p.cmd_params, "%d", strlen((char *)send_data->data));
+	sprintf((char *)tcp_at_send_data_p.cmd_params, "%d", strlen((char *)send_data.data));
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(tcp_at_send_data_p);
 	
-	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(1000);
+	return LWESP_TCP_AWAIT_RESP(1000);
 	
-	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
-		lwesp_ll_send_data(send_data->data, strlen((char *)send_data->data));
-		lwesp_sys_at_get_tcp_response(send_data);
-	}	
-
-	return lwesp_at_resp_flag;
-	
-
 }
 
+lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_ll_send_data(send_data.data, strlen((char *)send_data.data));
+	
+	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(5000); // Send OK
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(5000); // +IPD
+	
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_tcp_response();
+		return LWESP_RESP_OK;
+	}
+	
+	return lwesp_at_resp_flag;
+}
