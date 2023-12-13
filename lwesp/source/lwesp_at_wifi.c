@@ -418,7 +418,7 @@ lwesp_resp_t lwesp_create_soft_ap(lwesp_wifi_at_create_soft_ap_t soft_ap) {
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(wifi_at_create_soft_ap_p);
 	
-	return LWESP_WIFI_AWAIT_RESP(1000);
+	return LWESP_WIFI_AWAIT_RESP(2000);
 	
 }
 

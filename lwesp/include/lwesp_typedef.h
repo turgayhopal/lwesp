@@ -224,6 +224,22 @@ typedef struct lwesp_tcp_at_send_data_s {
 	uint8_t data[256];
 } lwesp_tcp_at_send_data_t;
 
+typedef struct lwesp_tcp_at_get_ip_addr_s {
+	uint8_t ap_ip_addr[20];
+	uint8_t ap_mac_addr[18];
+	uint8_t sta_ip_addr[20];
+	uint8_t sta_mac_addr[18];
+} lwesp_tcp_at_get_ip_addr_t;
+
+typedef struct lwesp_tcp_at_create_tcp_server_s {
+	uint8_t mode[2];
+	uint8_t port[6];
+} lwesp_tcp_at_create_tcp_server_t;
+	
+typedef struct lwesp_tcp_at_set_tcp_server_timeout_s {
+	uint8_t timeout[6];
+} lwesp_tcp_at_set_tcp_server_timeout_t;
+
 typedef struct lwesp_tcp_command_s {
 	lwesp_resp_t (*lwesp_check_conn_status)			(lwesp_tcp_at_conn_t *conn);
 	lwesp_resp_t (*lwesp_resolve_domain)				(lwesp_tcp_at_domain_t *domain);
@@ -237,8 +253,11 @@ typedef struct lwesp_tcp_command_s {
 	lwesp_resp_t (*lwesp_start_udp_connection)  (lwesp_tcp_at_start_udp_conn_t start_conn, lwesp_at_connection_type_t type);
 	lwesp_resp_t (*lwesp_start_ssl_connection)  (lwesp_tcp_at_start_ssl_conn_t start_conn, lwesp_at_connection_type_t type);
 	lwesp_resp_t (*lwesp_close_connection)      (uint8_t *link_id, lwesp_at_connection_type_t type);
-	lwesp_resp_t (*lwesp_send_data_lenght)      (lwesp_tcp_at_send_data_t send_data);
+	lwesp_resp_t (*lwesp_send_data_lenght)      (lwesp_tcp_at_send_data_t send_data, uint8_t *link_id, lwesp_at_connection_type_t type);
 	lwesp_resp_t (*lwesp_send_data) 		  			(lwesp_tcp_at_send_data_t send_data, char *response_body, int *status_code);
+	lwesp_resp_t (*lwesp_get_ip_addr)      			(lwesp_tcp_at_get_ip_addr_t *ip);
+	lwesp_resp_t (*lwesp_create_tcp_server)     (lwesp_tcp_at_create_tcp_server_t server);
+	lwesp_resp_t (*lwesp_set_tcp_server_timeout)(lwesp_tcp_at_set_tcp_server_timeout_t timeout);
 } lwesp_tcp_command_t;
 
 typedef struct lwesp_client_s {
@@ -246,7 +265,6 @@ typedef struct lwesp_client_s {
 	lwesp_wifi_command_t  wifi;
 	lwesp_tcp_command_t   tcp;
 } lwesp_client_t;
-
 
 typedef struct lwesp_ll_s {
 	lwesp_resp_t (*lwesp_ll_configure_uart_clock)(void);

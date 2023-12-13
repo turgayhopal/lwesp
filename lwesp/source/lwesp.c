@@ -51,6 +51,9 @@ lwesp_resp_t lwesp_init(lwesp_client_t *client, lwesp_resp_wifi_callback wifi_ca
 	client->tcp.lwesp_close_connection = lwesp_close_connection;
 	client->tcp.lwesp_send_data_lenght = lwesp_send_data_lenght;
 	client->tcp.lwesp_send_data = lwesp_send_data;
+	client->tcp.lwesp_get_ip_addr = lwesp_get_ip_addr;
+	client->tcp.lwesp_create_tcp_server = lwesp_create_tcp_server;
+	client->tcp.lwesp_set_tcp_server_timeout = lwesp_set_tcp_server_timeout;
 
 	lwesp_sys_init();
 	lwesp_sys_set_resp_wifi_callback(wifi_callback);

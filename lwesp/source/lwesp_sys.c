@@ -533,6 +533,34 @@ void lwesp_sys_at_get_tcp_response(char *response_body, int *status_code) {
 	}
 }
 
+void lwesp_sys_at_get_ip_addr(lwesp_tcp_at_get_ip_addr_t *ip) {
+	printf("%s", (char *)lwesp_response_buffer);
+	
+	char *current = (char *)lwesp_response_buffer;
+    
+	while ((current = strstr(current, "CIFSR:")) != NULL) {
+		if (strstr(current, "APIP,") != NULL) {
+			if (sscanf(current, "CIFSR:APIP,\"%15[^\"]\"", ip->ap_ip_addr) != 1) {
+				//
+			}
+		} else if (strstr(current, "APMAC,") != NULL) {
+			if (sscanf(current, "CIFSR:APMAC,\"%17[^\"\n]", ip->ap_mac_addr) != 1) {
+				//
+			}
+		} else if (strstr(current, "STAIP,") != NULL) {
+			if (sscanf(current, "CIFSR:STAIP,\"%15[^\"]\"", ip->sta_ip_addr) != 1) {
+				//
+			}
+		} else if (strstr(current, "STAMAC,") != NULL) {
+			if (sscanf(current, "CIFSR:STAMAC,\"%17[^\"\n]", ip->sta_mac_addr) != 1) {
+				//
+			}
+		}
+		current++;
+	}
+	
+}
+
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {
 	
 	memset(lwesp_sys_tx_buffer, 0x00, LWESP_SYS_TX_BUFFER_SIZE);

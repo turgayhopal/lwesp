@@ -26,8 +26,10 @@ lwesp_resp_t lwesp_start_tcp_connection(lwesp_tcp_at_start_tcp_conn_t start_conn
 lwesp_resp_t lwesp_start_udp_connection(lwesp_tcp_at_start_udp_conn_t start_conn, lwesp_at_connection_type_t type);
 lwesp_resp_t lwesp_start_ssl_connection(lwesp_tcp_at_start_ssl_conn_t start_conn, lwesp_at_connection_type_t type);
 lwesp_resp_t lwesp_close_connection(uint8_t *link_id, lwesp_at_connection_type_t type);
-lwesp_resp_t lwesp_send_data_lenght(lwesp_tcp_at_send_data_t send_data);
+lwesp_resp_t lwesp_send_data_lenght(lwesp_tcp_at_send_data_t send_data, uint8_t *link_id, lwesp_at_connection_type_t type);
 lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data, char *response_body, int *status_code);
-
+lwesp_resp_t lwesp_get_ip_addr(lwesp_tcp_at_get_ip_addr_t *ip);
+lwesp_resp_t lwesp_create_tcp_server(lwesp_tcp_at_create_tcp_server_t server);
+lwesp_resp_t lwesp_set_tcp_server_timeout(lwesp_tcp_at_set_tcp_server_timeout_t timeout);
 
 #endif /* INC_LWESP_AT_TCP_H_ */

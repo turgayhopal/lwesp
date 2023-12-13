@@ -80,6 +80,24 @@ static lwesp_at_parameter_t tcp_at_send_data_p = {
 	.cmd_params = NULL,
 };
 
+static lwesp_at_parameter_t tcp_at_get_local_ip_p = {
+	.cmd_type = LWESP_CMD_TYPE_EXECUTE,
+	.cmd_key  = "AT+CIFSR",
+	.cmd_params = NULL,
+};
+
+static lwesp_at_parameter_t tcp_at_create_tcp_server_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPSERVER",
+	.cmd_params = NULL,
+};
+
+static lwesp_at_parameter_t tcp_at_set_tcp_server_timeout_p = {
+	.cmd_type = LWESP_CMD_TYPE_SET,
+	.cmd_key  = "AT+CIPSTO",
+	.cmd_params = NULL,
+};
+
 lwesp_resp_t LWESP_TCP_AWAIT_RESP(uint32_t ms) {
 	
 	TickType_t ticks = xTaskGetTickCount();
@@ -322,14 +340,18 @@ lwesp_resp_t lwesp_close_connection(uint8_t *link_id, lwesp_at_connection_type_t
 	
 }
 
-lwesp_resp_t lwesp_send_data_lenght(lwesp_tcp_at_send_data_t send_data) {
+lwesp_resp_t lwesp_send_data_lenght(lwesp_tcp_at_send_data_t send_data, uint8_t *link_id, lwesp_at_connection_type_t type) {
 	
-	sprintf((char *)tcp_at_send_data_p.cmd_params, "%d", strlen((char *)send_data.data));
+	if (type == LWESP_AT_CONN_TYPE_MULTIPLE) {
+		sprintf((char *)tcp_at_send_data_p.cmd_params, "%s,%d", link_id, strlen((char *)send_data.data));
+	} else {
+		sprintf((char *)tcp_at_send_data_p.cmd_params, "%d", strlen((char *)send_data.data));
+	} 
 	
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_sys_send_command(tcp_at_send_data_p);
-	
-	return LWESP_TCP_AWAIT_RESP(1000);
+
+	return LWESP_TCP_AWAIT_RESP(3000);
 	
 }
 
@@ -338,7 +360,7 @@ lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data, char *response_
 	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
 	lwesp_ll_send_data(send_data.data, strlen((char *)send_data.data));
 	
-	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(5000); // Send OK
+	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(10000); // Send OK
 
 	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
 		lwesp_sys_at_get_tcp_response(response_body, status_code);
@@ -346,4 +368,40 @@ lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data, char *response_
 	}
 	
 	return lwesp_at_resp_flag;
+}
+
+lwesp_resp_t lwesp_get_ip_addr(lwesp_tcp_at_get_ip_addr_t *ip) {
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(tcp_at_get_local_ip_p);
+	
+	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(1000);
+
+	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_at_get_ip_addr(ip);
+	}
+	
+	return lwesp_at_resp_flag;
+		
+}
+
+lwesp_resp_t lwesp_create_tcp_server(lwesp_tcp_at_create_tcp_server_t server) {
+	
+	sprintf((char *)tcp_at_create_tcp_server_p.cmd_params, "%s,%s", server.mode, server.port);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(tcp_at_create_tcp_server_p);
+	
+	return LWESP_TCP_AWAIT_RESP(1000);
+	
+}
+
+lwesp_resp_t lwesp_set_tcp_server_timeout(lwesp_tcp_at_set_tcp_server_timeout_t timeout) {
+	
+	sprintf((char *)tcp_at_set_tcp_server_timeout_p.cmd_params, "%s", timeout.timeout);
+	
+	lwesp_at_resp_flag = LWESP_RESP_UNKNOW;
+	lwesp_sys_send_command(tcp_at_set_tcp_server_timeout_p);
+	
+	return LWESP_TCP_AWAIT_RESP(1000);
 }
