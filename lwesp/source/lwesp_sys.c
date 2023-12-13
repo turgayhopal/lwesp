@@ -45,13 +45,6 @@ void vRxHandlerTask(void *pvParameters) {
 				lwesp_queue_flush(&lwesp_queue_rx);
 				lwesp_sys.resp_callback(LWESP_RESP_ERR);
 			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "+IPD") != NULL ) {
-				memset(lwesp_response_buffer, 0x00, LWESP_SYS_RESP_BUFFER_SIZE);
-				sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_callback(LWESP_RESP_RECV_IPD);
-			}		
 						
 			if (strstr((char *)lwesp_queue_rx.data, "WIFI DISCONNECT") != NULL ) {
 				lwesp_queue_flush(&lwesp_queue_rx);
@@ -495,21 +488,49 @@ lwesp_resp_tcp_t lwesp_sys_at_check_tcp_connection(void) {
 	}
 }
 
-void lwesp_sys_at_get_tcp_response(void) {
-	printf("%s", lwesp_response_buffer);
-	
-	char* token;
-	char* rest = (char *)lwesp_response_buffer;
-	
-	while ((token = strtok_r(rest, "\n", &rest))) {
-		char* key = strtok(token, ":");
-		char* value = strtok(NULL, ":");
+void lwesp_decode_chunked_body(const char *data, char *bodyBuffer) {
+	int chunkSize;
+	char *endptr;
+	int offset = 0;
 
-		if (key != NULL && value != NULL) {
-			printf("Key %s Value %s\r\n", key, value);
-		}
+	while (sscanf(data, "%x", &chunkSize) == 1 && chunkSize > 0) {
+			data = strchr(data, '\n') + 1;
+			
+			strncpy(bodyBuffer + offset, data, chunkSize);
+			offset += chunkSize;
+			data += chunkSize + 2;
 	}
 	
+	bodyBuffer[offset] = '\0';
+}
+
+int lwesp_decode_status_code(const char *data) {
+    const char *statusCodeStart = strstr(data, "HTTP/1.");
+    int statusCode = -1;
+
+    if (statusCodeStart != NULL) {
+        statusCodeStart += 9; 	// Move past "HTTP/1.x "
+        sscanf(statusCodeStart, "%d", &statusCode);
+    }
+
+    return statusCode;
+}
+
+void lwesp_sys_at_get_tcp_response(char *response_body, int *status_code) {
+	
+	while (strstr((char *)lwesp_queue_rx.data, "\r\n\r\n\r\n") == NULL);
+	
+	memset(lwesp_response_buffer, 0x00, LWESP_SYS_RESP_BUFFER_SIZE);
+	sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
+	lwesp_queue_flush(&lwesp_queue_rx);
+
+	*status_code = lwesp_decode_status_code((char *)lwesp_response_buffer);
+	
+	const char *body_start = strstr((char *)lwesp_response_buffer, "\r\n\r\n");
+	if (body_start != NULL) {
+		body_start += 4;	// Move past the CRLF CRLF to the start of the body
+		lwesp_decode_chunked_body(body_start, response_body);
+	}
 }
 
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter) {

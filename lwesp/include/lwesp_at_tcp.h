@@ -27,7 +27,7 @@ lwesp_resp_t lwesp_start_udp_connection(lwesp_tcp_at_start_udp_conn_t start_conn
 lwesp_resp_t lwesp_start_ssl_connection(lwesp_tcp_at_start_ssl_conn_t start_conn, lwesp_at_connection_type_t type);
 lwesp_resp_t lwesp_close_connection(uint8_t *link_id, lwesp_at_connection_type_t type);
 lwesp_resp_t lwesp_send_data_lenght(lwesp_tcp_at_send_data_t send_data);
-lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data);
+lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data, char *response_body, int *status_code);
 
 
 #endif /* INC_LWESP_AT_TCP_H_ */

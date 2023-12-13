@@ -24,7 +24,6 @@ typedef enum lwesp_resp_e{
 	LWESP_RESP_OK,
 	LWESP_RESP_ERR,
 	LWESP_RESP_FAIL,
-	LWESP_RESP_RECV_IPD,
 	LWESP_RESP_UNKNOW,
 	LWESP_RESP_TIMEOUT,
 	LWESP_RESP_CONF_ERR
@@ -239,7 +238,7 @@ typedef struct lwesp_tcp_command_s {
 	lwesp_resp_t (*lwesp_start_ssl_connection)  (lwesp_tcp_at_start_ssl_conn_t start_conn, lwesp_at_connection_type_t type);
 	lwesp_resp_t (*lwesp_close_connection)      (uint8_t *link_id, lwesp_at_connection_type_t type);
 	lwesp_resp_t (*lwesp_send_data_lenght)      (lwesp_tcp_at_send_data_t send_data);
-	lwesp_resp_t (*lwesp_send_data) 		  			(lwesp_tcp_at_send_data_t send_data);
+	lwesp_resp_t (*lwesp_send_data) 		  			(lwesp_tcp_at_send_data_t send_data, char *response_body, int *status_code);
 } lwesp_tcp_command_t;
 
 typedef struct lwesp_client_s {
