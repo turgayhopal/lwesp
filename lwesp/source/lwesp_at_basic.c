@@ -79,11 +79,9 @@ lwesp_resp_t LWESP_BASIC_AWAIT_RESP(uint32_t ms) {
 void lwesp_sys_resp_callback_basic(lwesp_resp_t resp) {
 	switch(resp) {
 		case LWESP_RESP_OK:
-			printf("******************RESP OK******************\r\n");
 			lwesp_at_resp_flag = LWESP_RESP_OK;
 			break;
 		case LWESP_RESP_ERR:
-			printf("******************RESP ERR******************\r\n");
 			lwesp_at_resp_flag = LWESP_RESP_ERR;
 			break;
 		case LWESP_RESP_UNKNOW:

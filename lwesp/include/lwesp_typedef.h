@@ -260,6 +260,11 @@ typedef struct lwesp_tcp_command_s {
 	lwesp_resp_t (*lwesp_set_tcp_server_timeout)(lwesp_tcp_at_set_tcp_server_timeout_t timeout);
 } lwesp_tcp_command_t;
 
+typedef enum lwesp_api_resp_e {
+	LWESP_API_CONF_ERR = 0x00,
+	LWESP_API_CONF_OK = 0x01
+} lwesp_api_resp_t;
+
 typedef struct lwesp_client_s {
 	lwesp_basic_command_t basic;
 	lwesp_wifi_command_t  wifi;

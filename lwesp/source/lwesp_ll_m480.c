@@ -187,8 +187,6 @@ lwesp_resp_t lwesp_ll_hard_reset(uint8_t state) {
 
 lwesp_resp_t lwesp_ll_send_data(uint8_t *data, uint32_t size) {
 	
-	printf("Data : %s\r\n", data);
-	
 	UART_Write(ll_uart_t.uart_t, data, size);
 	UART_Write(ll_uart_t.uart_t, (uint8_t *)"\r\n", 2);
 	
