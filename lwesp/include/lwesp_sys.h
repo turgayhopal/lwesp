@@ -33,6 +33,9 @@ void vRxHandlerTask(void *pvParameters);
 void lwesp_sys_init(void);
 void lwesp_sys_send_command(lwesp_at_parameter_t parameter);
 
+void lwesp_sys_enable_callbacks(void);
+void lwesp_sys_disable_callbacks(void);
+
 void lwesp_sys_set_resp_callback(lwesp_resp_callback resp_callback);
 void lwesp_sys_set_resp_wifi_callback(lwesp_resp_wifi_callback resp_callback);
 

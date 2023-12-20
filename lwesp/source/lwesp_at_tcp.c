@@ -359,9 +359,11 @@ lwesp_resp_t lwesp_send_data(lwesp_tcp_at_send_data_t send_data, char *response_
 	lwesp_ll_send_data(send_data.data, strlen((char *)send_data.data));
 	
 	lwesp_at_resp_flag = LWESP_TCP_AWAIT_RESP(10000); // Send OK
-
+	
 	if (lwesp_at_resp_flag != LWESP_RESP_TIMEOUT) {
+		lwesp_sys_disable_callbacks();
 		lwesp_sys_at_get_tcp_response(response_body, status_code);
+		lwesp_sys_enable_callbacks();
 		return LWESP_RESP_OK;
 	}
 	

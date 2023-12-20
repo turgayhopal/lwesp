@@ -5,6 +5,7 @@
 
 #include "lwesp_sys.h"
 
+static uint32_t callback_st_flag = 0;
 static lwesp_queue_t lwesp_queue_rx;
 
 static lwesp_sys_t lwesp_sys = {
@@ -32,53 +33,64 @@ void vRxHandlerTask(void *pvParameters) {
 
 	for (;;) {
 		
-		if (!lwesp_queue_is_empty(&lwesp_queue_rx)) {
+		if (callback_st_flag) {
 			
-			if (strstr((char *)lwesp_queue_rx.data, "OK") != NULL) {
-				memset(lwesp_response_buffer, 0x00, LWESP_SYS_RESP_BUFFER_SIZE);
-				sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_callback(LWESP_RESP_OK);
-			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "ERROR") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_callback(LWESP_RESP_ERR);
-			}
-						
-			if (strstr((char *)lwesp_queue_rx.data, "WIFI DISCONNECT") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_DISCONNECT, NULL);
-			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "WIFI CONNECTED") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_CONNECTED, NULL);
-			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "WIFI GOT IP") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_GOT_IP, NULL);
-			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "+STA_CONNECTED") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_CONNECTED, NULL);
-			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "+STA_DISCONNECTED") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_DISCONNECTED, NULL);
-			}
-			
-			if (strstr((char *)lwesp_queue_rx.data, "+DIST_STA_IP") != NULL ) {
-				lwesp_queue_flush(&lwesp_queue_rx);
-				lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, NULL);
-			}
+			if (!lwesp_queue_is_empty(&lwesp_queue_rx)) {
+		
+				if (strstr((char *)lwesp_queue_rx.data, "OK") != NULL) {
+					memset(lwesp_response_buffer, 0x00, LWESP_SYS_RESP_BUFFER_SIZE);
+					sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_callback(LWESP_RESP_OK);
+				}
 				
-			vTaskDelay(1);
+				if (strstr((char *)lwesp_queue_rx.data, "ERROR") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_callback(LWESP_RESP_ERR);
+				}
+							
+				if (strstr((char *)lwesp_queue_rx.data, "WIFI DISCONNECT") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_DISCONNECT, NULL);
+				}
+				
+				if (strstr((char *)lwesp_queue_rx.data, "WIFI CONNECTED") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_CONNECTED, NULL);
+				}
+				
+				if (strstr((char *)lwesp_queue_rx.data, "WIFI GOT IP") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_GOT_IP, NULL);
+				}
+				
+				if (strstr((char *)lwesp_queue_rx.data, "+STA_CONNECTED") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_CONNECTED, NULL);
+				}
+				
+				if (strstr((char *)lwesp_queue_rx.data, "+STA_DISCONNECTED") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_DISCONNECTED, NULL);
+				}
+				
+				if (strstr((char *)lwesp_queue_rx.data, "+DIST_STA_IP") != NULL ) {
+					lwesp_queue_flush(&lwesp_queue_rx);
+					lwesp_sys.resp_wifi_callback(LWESP_RESP_WIFI_STA_GET_IP, NULL);
+				}
+			}			
 		}
+		
+		vTaskDelay(1);
 	}
+}
+
+void lwesp_sys_enable_callbacks(void) {
+	callback_st_flag = 1;
+}
+
+void lwesp_sys_disable_callbacks(void) {
+	callback_st_flag = 0;
 }
 
 void lwesp_sys_init(void) {
@@ -93,6 +105,8 @@ void lwesp_sys_init(void) {
 	lwesp_ll.lwesp_ll_configure_uart();
 	lwesp_ll.lwesp_ll_configure_uart_irq();
 	lwesp_ll_configure_rx_callback(lwesp_ll_rx_handler_callback);
+	
+	lwesp_sys_enable_callbacks();
 	
 	xTaskCreate(vRxHandlerTask, "LWESP RX Handler",  lwespRX_HANDLER_TASK_STACK_SIZE, NULL, lwespRX_HANDLER_TASK_PRIORITY, NULL);
 	
@@ -519,11 +533,13 @@ int lwesp_decode_status_code(const char *data) {
 void lwesp_sys_at_get_tcp_response(char *response_body, int *status_code) {
 	
 	while (strstr((char *)lwesp_queue_rx.data, "\r\n\r\n\r\n") == NULL);
-	
+
 	memset(lwesp_response_buffer, 0x00, LWESP_SYS_RESP_BUFFER_SIZE);
 	sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
 	lwesp_queue_flush(&lwesp_queue_rx);
 
+	printf("DATA %s", lwesp_response_buffer);
+	
 	*status_code = lwesp_decode_status_code((char *)lwesp_response_buffer);
 	
 	const char *body_start = strstr((char *)lwesp_response_buffer, "\r\n\r\n");
@@ -531,11 +547,10 @@ void lwesp_sys_at_get_tcp_response(char *response_body, int *status_code) {
 		body_start += 4;	// Move past the CRLF CRLF to the start of the body
 		lwesp_decode_chunked_body(body_start, response_body);
 	}
+
 }
 
 void lwesp_sys_at_get_ip_addr(lwesp_tcp_at_get_ip_addr_t *ip) {
-	printf("%s", (char *)lwesp_response_buffer);
-	
 	char *current = (char *)lwesp_response_buffer;
     
 	while ((current = strstr(current, "CIFSR:")) != NULL) {
