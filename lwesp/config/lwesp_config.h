@@ -14,8 +14,9 @@
 
 //   <o>MCU Selection <0=>Disable
 //                		<1=>Nuvoton M480 Series
+//                		<2=>Nuvoton M261 Series
 //   <i> Host MCU Selection	
-#define LWESP_MCU									 	1
+#define LWESP_MCU									 	2
 
 //   <o>UART IT Debug <0=>Disable
 //                		<1=>Enable
@@ -46,6 +47,10 @@
 
 #if LWESP_MCU == 1
 #define LWESP_MCU_NUVOTON_M480
+#endif 
+
+#if LWESP_MCU == 2
+#define LWESP_MCU_NUVOTON_M261
 #endif 
 
 // <<< end of configuration section >>>
