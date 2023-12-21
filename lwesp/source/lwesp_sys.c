@@ -538,8 +538,6 @@ void lwesp_sys_at_get_tcp_response(char *response_body, int *status_code) {
 	sprintf((char *)lwesp_response_buffer, "%s", lwesp_queue_rx.data);
 	lwesp_queue_flush(&lwesp_queue_rx);
 
-	printf("DATA %s", lwesp_response_buffer);
-	
 	*status_code = lwesp_decode_status_code((char *)lwesp_response_buffer);
 	
 	const char *body_start = strstr((char *)lwesp_response_buffer, "\r\n\r\n");

@@ -85,8 +85,6 @@ lwesp_api_resp_t lwesp_api_http_get(char *host, char *port, char* url, char *res
 		
 		sprintf((char *)data.data, "GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", url, host);
 		
-		printf("Data : %s \r\n", data.data);
-		
 		resp = LWESP_RESP_UNKNOW;
 		resp = lwesp_client.tcp.lwesp_send_data_lenght(data, 0, LWESP_AT_CONN_TYPE_SINGLE);
 		
