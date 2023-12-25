@@ -108,3 +108,14 @@ lwesp_api_resp_t lwesp_api_http_get(char *host, char *port, char* url, char *res
 
 	return LWESP_API_CONF_ERR;
 }
+
+lwesp_api_resp_t lwesp_api_ping(lwesp_tcp_at_ping_t *ping) {
+	
+	lwesp_at_tcp_focus_on();
+	
+	if (lwesp_client.tcp.lwesp_ping_ip(ping) == LWESP_RESP_OK) {
+		return LWESP_API_CONF_OK;
+	}
+	
+	return LWESP_API_CONF_ERR;
+}
